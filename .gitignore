@@ -1,0 +1,8 @@
+*.o
+*.out
+*.run
+*.exe
+
+
+*.swo
+*.swp
