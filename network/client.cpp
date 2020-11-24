@@ -15,6 +15,8 @@ int main(){
 
         sock.connect("127.0.0.1", 35020);
 
+        std::cout << "using port " << sock.getLocalPort() << std::endl;
+
         while(1){
             std::this_thread::sleep_for(std::chrono::seconds(1));
             std::cout << "Sending data" << std::endl;

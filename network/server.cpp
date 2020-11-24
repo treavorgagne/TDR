@@ -1,4 +1,5 @@
 
+#include <SFML/Network/TcpSocket.hpp>
 #include <iostream>
 #include <SFML/Network.hpp>
 
@@ -27,6 +28,7 @@ void ServerCommunicator::start (int port){
     listener.listen(port);
     selector.add(listener);
     num_players = 0;
+    std::cout << "Started server on port " << listener.getLocalPort() << std::endl;
 }
 
 int ServerCommunicator::wait_for_players(int playercount){
@@ -37,9 +39,12 @@ int ServerCommunicator::wait_for_players(int playercount){
                 sf::TcpSocket* client = new sf::TcpSocket;
                 if (listener.accept(*client) == sf::Socket::Done){
                         clients.push_back(client); //add client to connections
-                        std::cout << "New connection received from " << client->getRemoteAddress() << std::endl;
+                        std::cout << "New connection received from " << client->getRemoteAddress() << ":" <<
+                            client->getRemotePort() << std::endl;
+
                         selector.add(*client); //add client to selector
                         num_players++;
+                        std::cout << "Players connected: " << num_players << std::endl;
 
                 }
                 else{
@@ -58,26 +63,46 @@ int ServerCommunicator::wait_for_players(int playercount){
 
     return 0;
 }
+
+
 int ServerCommunicator::accept_inputs(){
     state = 1;
     std::cout << "Now accepting inputs" << std::endl;
+    printf("\n");
+    selector.remove(listener); //remove listener to reject new connections
+    listener.close();
+
     while(state == 1){
         //iterate through the connections and check for data
+        if (clients.size() == 0){
+            std::cout << "All clients disconnected" << std::endl;
+            return 1;
+        }
+
+
+        selector.wait(); //wait for a socket to be ready
         for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it){
+
             sf::TcpSocket& client = **it;
+
             if (selector.isReady(client)){
-                // A client has sent some data, we can receive it
+                // This client has sent some data, we can receive it
                 sf::Packet packet;
                 sf::Socket::Status status = client.receive(packet);
                 if (status == sf::Socket::Done){
                     //extract packet
                     char data[25];
                     packet >> data;
-                    int client_num = std::distance(clients.begin(), it);
-                    std::cout << "Recieved some data from client: " << client_num << data << std::endl;
+                    std::cout << "Client: " << client.getRemotePort() << ":" << data << std::endl;
                 }
                 else if(status == sf::Socket::Disconnected){
-                    std::cout << "Socket has been disconnected" << std::endl;
+                    std::cout << "Client has been disconnected" << std::endl;
+                    //code to remove client here
+                    selector.remove(client);
+                    client.disconnect();
+                    it = clients.erase(it);
+
+                    std::cout << "Clients remaining: " << clients.size() << std::endl;
                 }
                 else{
                     std::cout << "Error recieving data from client: " << status << std::endl;
