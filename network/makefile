@@ -1,17 +1,21 @@
+CC = g++
+CFLAGS = -Wall -Wextra -Werror -std=c++20
+LIBS = -lsfml-network -lsfml-system -lstdc++
 
-
-all: build
-
+all: server client
 
 server.o: server.cpp
-	g++ -Wall -Wextra -Werror -o server.o -c server.cpp
+	$(CC) -c server.cpp
 
 client.o: client.cpp
-	g++ -Wall -Wextra -Werror -o client.o -c client.cpp
+	$(CC) -c client.cpp
 
-build: server.o client.o
-	g++ server.o -o server.run -lsfml-network -lsfml-system
-	g++ client.o -o client.run -lsfml-network -lsfml-system
+server: server.o
+	$(CC) -o server.run server.o $(CFLAGS) $(LIBS)
+
+client: client.o
+	$(CC) -o client.run client.o $(CFLAGS) $(LIBS)
+
 
 clean:
 	rm server.o client.o
