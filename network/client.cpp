@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-#include<thread>
+#include <thread>
 
 int main(){
 
@@ -17,18 +17,18 @@ int main(){
 
         while(1){
             std::this_thread::sleep_for(std::chrono::seconds(1));
-            std::cout << "Sending a keydown command" << std::endl;
+            std::cout << "Sending data" << std::endl;
 
             const char keydown[] = "keydown";
 
-            sock.send(keydown, sizeof(keydown));
+            sf::Packet packet;
 
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            std::cout << "Sending a key-up command" << std::endl;
+            packet << keydown;
 
-            const char keyup[] = "keyup";
+            if(sock.send(packet) != sf::Socket::Done){
+                std::cout << "Error sending data" << std::endl;
+            }
 
-            sock.send(keyup, sizeof(keyup));
 
         }
 

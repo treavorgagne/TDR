@@ -60,17 +60,29 @@ int ServerCommunicator::wait_for_players(int playercount){
 }
 int ServerCommunicator::accept_inputs(){
     state = 1;
+    std::cout << "Now accepting inputs" << std::endl;
     while(state == 1){
         //iterate through the connections and check for data
-        selector.wait();
         for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it){
             sf::TcpSocket& client = **it;
             if (selector.isReady(client)){
-                // The client has sent some data, we can receive it
+                // A client has sent some data, we can receive it
                 sf::Packet packet;
-                if (client.receive(packet) == sf::Socket::Done){
-                    std::cout << "Recieved some data from client" << std::endl;
+                sf::Socket::Status status = client.receive(packet);
+                if (status == sf::Socket::Done){
+                    //extract packet
+                    char data[25];
+                    packet >> data;
+                    int client_num = std::distance(clients.begin(), it);
+                    std::cout << "Recieved some data from client: " << client_num << data << std::endl;
                 }
+                else if(status == sf::Socket::Disconnected){
+                    std::cout << "Socket has been disconnected" << std::endl;
+                }
+                else{
+                    std::cout << "Error recieving data from client: " << status << std::endl;
+                }
+
             }
         }
 
