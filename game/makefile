@@ -1,18 +1,22 @@
 
+CC = g++
+CFLAGS = -Wall -Wextra -Werror -std=c++1z
+LIBS =
+ifeq ($(OS), Windows_NT)
+	LIBS += -I C:/SFML-min/SFML-2.5.1/include -L C:/SFML-min/SFML-2.5.1/lib
+else
+	LIBS += -lsfml-system -lsfml-window -lsfml-graphics -lstdc++
+endif
 
-CPPFLAGS := -I C:/SFML-2.5.1/include -MMD -MP -DSFML_STATIC -IC:/SFML-2.5.1/include/SFML/Graphics.hpp
-CXXFLAGS := -std=c++17 -Wall -W -pedantic
-LDFLAGS  := -L C:/SFML-2.5.1/lib
-LDLIBS   := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lsfml-audio
 
 
 all: build
 
 gamelogic.o: gamelogic.cpp
-	g++ -c gamelogic.cpp -I C:/SFML-min/SFML-2.5.1/include -std=c++17
+	$(CC) -c gamelogic.cpp
 
 build: gamelogic.o
-	g++ gamelogic.o -o gamelogic.exe -I C:/SFML-min/SFML-2.5.1/include -L C:/SFML-min/SFML-2.5.1/lib -lsfml-graphics -lsfml-window -lsfml-system
+	$(CC) gamelogic.o -o gamelogic.exe $(LIBS)
 
 clean:
 	rm gamelogic.o gamelogic.exe

@@ -1,6 +1,11 @@
 CC = g++
-CFLAGS = -Wall -Wextra -Werror -std=c++2a
-LIBS = -lsfml-network -lsfml-system -lstdc++
+CFLAGS = -Wall -Wextra -Werror -std=c++1z
+LIBS =
+ifeq ($(OS), Windows_NT)
+	LIBS += -I C:/SFML-min/SFML-2.5.1/include -L C:/SFML-min/SFML-2.5.1/lib
+else
+	LIBS += -lsfml-network -lsfml-system -lstdc++
+endif
 
 all: server client
 
