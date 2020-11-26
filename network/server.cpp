@@ -83,6 +83,7 @@ int ServerCommunicator::accept_inputs(){
 
 
         selector.wait(); //wait for a socket to be ready
+
         for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it){
 
             sf::TcpSocket& client = **it;
@@ -91,11 +92,16 @@ int ServerCommunicator::accept_inputs(){
                 // This client has sent some data, we can receive it
                 sf::Packet packet;
                 sf::Socket::Status status = client.receive(packet);
+
                 if (status == sf::Socket::Done){
                     //extract packet
-                    char data[25];
-                    packet >> data;
-                    std::cout << "Client: " << client.getRemotePort() << ":" << data << std::endl;
+                    Playerinfo info;
+
+                    packet >> info;
+
+                    std::cout << "Packet recieved from client on port: " << client.getRemotePort() << std::endl;
+                    print_playerinfo(info);
+                    printf("\n");
                 }
                 else if(status == sf::Socket::Disconnected){
                     std::cout << "Client has been disconnected" << std::endl;

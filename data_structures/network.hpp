@@ -16,6 +16,7 @@ struct Playerinfo{
     sf::Vector2f bullet_direction;
 };
 
+void print_playerinfo(Playerinfo info);
 
 //includes overloads
 sf::Packet& operator <<(sf::Packet& packet, sf::Vector2f& vec);

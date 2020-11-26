@@ -63,11 +63,13 @@ int main(){ //for tests
 
         ClientCommunicator client;
 
-        client.connect("127.0.0.1", 35020);
+        if(client.connect("127.0.0.1", 35020) != 0){
+            return 1;
+        }
 
         while(1){
             std::this_thread::sleep_for(std::chrono::seconds(2));
-            std::cout << "Sending sample position info" << std::endl;
+            std::cout << "Sending sample position info:" << std::endl;
 
             Playerinfo info;
             info.position.first = 24.5;
@@ -75,8 +77,13 @@ int main(){ //for tests
             info.bullet_fired = true;
             info.bullet_direction = sf::Vector2f(23, 21.2);
             info.moving = false;
+            info.direction = MovementDirection::left;
+
+            print_playerinfo(info);
 
             client.send_info(info);
+
+            printf("\n");
 
         }
 
