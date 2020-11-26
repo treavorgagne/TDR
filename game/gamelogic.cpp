@@ -39,7 +39,7 @@ class Bullet
 public:
 	CircleShape shape;  // shape contains position and size
 	Vector2f currVelocity;
-	int owner; // will be player id of who fired it 
+	int owner; // will be player id of who fired it
 	Bullet()
 		: currVelocity(0.f, 0.f), owner(-1)
 	{
@@ -141,7 +141,7 @@ int main()
 	player.push_back(Player(p));
 	int firerate = 0;
 
-	//enemy 
+	//enemy
 	RectangleShape enemy;
 	enemy.setSize(Vector2f(25.f, 25.f));
 	enemy.setFillColor(Color::Yellow);
@@ -161,9 +161,9 @@ int main()
 
 	while (window.isOpen()) // opens game window
 	{
-		// needed for game 
-		Event e; 
-		while (window.pollEvent(e)) 
+		// needed for game
+		Event e;
+		while (window.pollEvent(e))
 		{
 			switch (e.type)
 			{
@@ -217,11 +217,11 @@ int main()
 		//Enemies
 		if (spawnrate > 0) spawnrate--;
 		if (spawnCounter < 20) spawnCounter++;
-		if (spawnCounter >= 20 && enemies.size() < 30 && spawnrate == 0) 
+		if (spawnCounter >= 20 && enemies.size() < 30 && spawnrate == 0)
 		{
 			bool spw = true;
 			Vector2f pos = Vector2f((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
-			
+
 			enemy.setPosition(pos);
 			for (size_t j = 0; j < walls.size(); j++) {
 				if (enemy.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) spw = false;
@@ -235,7 +235,7 @@ int main()
 
 		// shooting
 		if(firerate > 0) firerate--;
-		if (Mouse::isButtonPressed(Mouse::Left) && (firerate == 0)) 
+		if (Mouse::isButtonPressed(Mouse::Left) && (firerate == 0))
 		{
 			b.shape.setPosition(playerCenter);
 			b.currVelocity = aimDirNorm * eng.BulletSpeed;
@@ -264,9 +264,9 @@ int main()
 			else
 			{
 				//enemy collisions
-				for (size_t k = 0; k < enemies.size(); k++) 
+				for (size_t k = 0; k < enemies.size(); k++)
 				{
-					if (bullets[i].shape.getGlobalBounds().intersects(enemies[k].getGlobalBounds())) 
+					if (bullets[i].shape.getGlobalBounds().intersects(enemies[k].getGlobalBounds()))
 					{
 						player[bullets[i].owner].killCount++;
 						printf("%s killed again\nTotal Kills: %d\n", player[bullets[i].owner].username.c_str(), player[bullets[i].owner].killCount);

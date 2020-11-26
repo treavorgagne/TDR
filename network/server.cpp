@@ -7,6 +7,8 @@
 
 #include <list>
 
+#include "../data_structures/network.hpp"
+
 
 class ServerCommunicator {
 
@@ -103,6 +105,7 @@ int ServerCommunicator::accept_inputs(){
                     it = clients.erase(it);
 
                     std::cout << "Clients remaining: " << clients.size() << std::endl;
+
                 }
                 else{
                     std::cout << "Error recieving data from client: " << status << std::endl;
