@@ -129,7 +129,7 @@ int main()
 		walls.push_back(Map_Element(w));
 	}
 
-	p.boxTexture.loadFromFile("media/3.png");
+	p.boxTexture.loadFromFile("../media/3.png");
 	p.boxTexture.setSmooth(true);
 	p.box.setTexture(&p.boxTexture);
 	p.textureSize = p.boxTexture.getSize();
