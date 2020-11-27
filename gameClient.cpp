@@ -19,6 +19,7 @@ int main()
     // /* THIS CODE HERE IS THE SET UP FOR THE GAME */
     std::string ip;
     int port;
+	ClientCommunicator client;
 
     std::cout << "Enter IP Address: ";
     std::cin >> ip;
@@ -28,7 +29,6 @@ int main()
     std::cout << "Connecting to IP address: " << ip << "" << port << std::endl;
     ClientCommunicator client;
     client.connect("jmlsky.ddns.net", 1234);
-
     /* THIS CODE HERE IS FOR ONCE THE GAME START */
 
     // All class objects
