@@ -19,14 +19,17 @@ int main()
     // /* THIS CODE HERE IS THE SET UP FOR THE GAME */
     std::string ip;
     int port;
+	ClientCommunicator client;
 
     std::cout << "Enter IP Address: ";
     std::cin >> ip;
     std::cout << "Enter Port Number: ";
     std::cin >> port;
 
-    std::cout << "Connecting to IP address: " << ip << "" << port << std::endl;
-    //connect();
+    if(client.connect(ip, port) != 0){
+		std::cout << "Unable to connect to server" << std::endl;
+		exit(EXIT_FAILURE);
+	} 
     
     /* THIS CODE HERE IS FOR ONCE THE GAME START */
     
