@@ -20,9 +20,6 @@ client: gameClient.o client.o playerinfo.o
 	$(CC) -o gameClient.exe gameClient.o client.o playerinfo.o $(LIBS)
 
 
-clean:
-	rm gameClient.o game.exe
-
 server.o: network/server.cpp
 	$(CC) -c network/server.cpp $(LIBS)
 
@@ -36,4 +33,4 @@ playerinfo.o: network/playerinfo.cpp
 
 
 clean:
-	rm gameClient.o
+	rm *.o gameClient.exe 
