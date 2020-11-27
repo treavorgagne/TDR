@@ -5,6 +5,7 @@
 #include "game.hpp"
 
 #include <list>
+#include <vector>
 
 //used for sending position and gunshots from client to server
 //also used by server to represent each player to client
@@ -14,6 +15,19 @@ struct Playerinfo{
     MovementDirection direction;
     bool bullet_fired;
     sf::Vector2f bullet_direction;
+};
+
+struct Player{
+    int playerid;
+    float health;
+    Playerinfo posinfo;
+};
+
+//Distributed by the server to all players minimum 4x a second
+struct Gameinfo{
+    int num_players; //used so client knows how many playerinfos to expect.
+    int client_id; //used so client knows which player in the vector is itself.
+    std::vector<Player> players;
 };
 
 void print_playerinfo(Playerinfo info);

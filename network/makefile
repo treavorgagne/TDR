@@ -10,13 +10,15 @@ endif
 all: server client
 
 server.o: server.cpp
-	$(CC) -c server.cpp
+	$(CC) -c server.cpp $(LIBS)
+
 
 client.o: client.cpp
-	$(CC) -c client.cpp
+	$(CC) -c client.cpp $(LIBS)
+
 
 playerinfo.o: playerinfo.cpp
-	$(CC) -c playerinfo.cpp
+	$(CC) -c playerinfo.cpp $(LIBS)
 
 server: server.o playerinfo.o
 	$(CC) -o server.run server.o playerinfo.o $(CFLAGS) $(LIBS)

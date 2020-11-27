@@ -13,10 +13,10 @@ endif
 all: build
 
 gamelogic.o: gamelogic.cpp
-	$(CC) -c gamelogic.cpp
+	$(CC) -c gamelogic.cpp $(LIBS)
 
 build: gamelogic.o
-	$(CC) gamelogic.o -o gamelogic.exe $(LIBS)
+	$(CC) gamelogic.o -o gamelogic.exe $(LIBS) $(CFLAGS)
 
 clean:
 	rm gamelogic.o gamelogic.exe
