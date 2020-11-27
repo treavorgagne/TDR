@@ -24,6 +24,7 @@ class ClientCommunicator {
     public:
         int connect(std::string ip, int port);
         int send_info(Playerinfo info);
+        Gameinfo receive_gameinfo();
 
 };
 
@@ -56,7 +57,18 @@ int ClientCommunicator::send_info(Playerinfo info){
     return 0;
 }
 
+Gameinfo ClientCommunicator::receive_gameinfo(){
+    Gameinfo info;
 
+    sf::Packet packet;
+
+    if(conn.receive(packet) != sf::Socket::Done){
+        std::cout << "Error recieving game information from server" << std::endl;
+        info.success = 1;
+    }
+
+    return info;
+}
 
 
 int main(){ //for tests
