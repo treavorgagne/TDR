@@ -26,18 +26,9 @@ int main()
     std::cout << "Enter Port Number: ";
     std::cin >> port;
 
-<<<<<<< HEAD
-    if(client.connect(ip, port) != 0){
-		std::cout << "Unable to connect to server" << std::endl;
-		exit(EXIT_FAILURE);
-	} 
-    
-=======
     std::cout << "Connecting to IP address: " << ip << "" << port << std::endl;
     ClientCommunicator client;
     client.connect("jmlsky.ddns.net", 1234);
-
->>>>>>> 0fe7ebf949b9cc31073e3ff6661a87947e72b258
     /* THIS CODE HERE IS FOR ONCE THE GAME START */
 
     // All class objects
