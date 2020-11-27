@@ -1,29 +1,7 @@
 
-#include <SFML/Network/TcpSocket.hpp>
-#include <iostream>
-#include <SFML/Network.hpp>
-
-#include <thread>
-
-#include <list>
-
-#include "../data_structures/network.hpp"
+#include "network.hpp"
 
 
-class ServerCommunicator {
-
-    sf::TcpListener listener;
-    std::list<sf::TcpSocket*> clients;
-    sf::SocketSelector selector;
-    int num_players;
-    int state; //0 == accepting connections, 1== playing game
-
-    public:
-        void start(int port);
-        int wait_for_players(int playercount);
-        int accept_inputs();
-
-};
 
 
 void ServerCommunicator::start (int port){
@@ -65,6 +43,23 @@ int ServerCommunicator::wait_for_players(int playercount){
 
     return 0;
 }
+
+int ServerCommunicator::broadcast_game_info(Gameinfo info){
+    //send each client the game information
+
+    sf::Packet packet;
+    for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it){
+        sf::TcpSocket& client = **it;
+
+        //packet << info;
+
+        if(client.send(packet) != sf::Socket::Done){
+            std::cout << "Failed to send gameinfo to: " << client.getRemotePort() << std::endl;
+        }
+    }
+
+    return 0;
+};
 
 
 int ServerCommunicator::accept_inputs(){

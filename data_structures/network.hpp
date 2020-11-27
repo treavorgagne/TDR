@@ -25,6 +25,7 @@ struct Playerupdate{
 
 //Distributed by the server to all players minimum 4x a second
 struct Gameinfo{
+    int success; //If the client failed to recieve a packet, it must set this to 1 so it is ignored
     int num_players; //used so client knows how many playerinfos to expect.
     int client_id; //used so client knows which player in the vector is itself.
     std::vector<Playerupdate> players;
@@ -33,6 +34,8 @@ struct Gameinfo{
 void print_playerinfo(Playerinfo info);
 
 //includes overloads
+//
+//overloads for playerinfo
 sf::Packet& operator <<(sf::Packet& packet, sf::Vector2f& vec);
 sf::Packet& operator >>(sf::Packet& packet, sf::Vector2f& vec);
 sf::Packet& operator <<(sf::Packet& packet, std::pair<float, float>& position);
@@ -41,3 +44,13 @@ sf::Packet& operator <<(sf::Packet& packet, MovementDirection& direction);
 sf::Packet& operator >>(sf::Packet& packet, MovementDirection& direction);
 sf::Packet& operator <<(sf::Packet& packet, Playerinfo& info);
 sf::Packet& operator >>(sf::Packet& packet, Playerinfo& info);
+
+
+//overloads for playerupdate
+sf::Packet& operator <<(sf::Packet& packet, Playerupdate& info);
+sf::Packet& operator >>(sf::Packet& packet, Playerupdate& info);
+
+
+//overloads for gameinfo
+sf::Packet& operator <<(sf::Packet& packet, Gameinfo& info);
+sf::Packet& operator >>(sf::Packet& packet, Gameinfo& info);

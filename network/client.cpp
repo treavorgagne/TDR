@@ -1,31 +1,7 @@
 
-#include <SFML/Network/Packet.hpp>
-#include <SFML/Network/Socket.hpp>
-#include <SFML/Network/TcpSocket.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <iostream>
-
-#include <SFML/Network.hpp>
-
-#include <chrono>
-
-#include <thread>
-
-#include <string>
-
-#include "../data_structures/network.hpp"
+#include "network.hpp"
 
 
-class ClientCommunicator {
-
-    sf::TcpSocket conn;
-    bool connected;
-
-    public:
-        int connect(std::string ip, int port);
-        int send_info(Playerinfo info);
-
-};
 
 int ClientCommunicator::connect(std::string ip, int port){
     if(conn.connect(ip, port) != sf::Socket::Done){
@@ -56,7 +32,18 @@ int ClientCommunicator::send_info(Playerinfo info){
     return 0;
 }
 
+Gameinfo ClientCommunicator::receive_gameinfo(){
+    Gameinfo info;
 
+    sf::Packet packet;
+
+    if(conn.receive(packet) != sf::Socket::Done){
+        std::cout << "Error recieving game information from server" << std::endl;
+        info.success = 1;
+    }
+
+    return info;
+}
 
 
 // int main(){ //for tests
