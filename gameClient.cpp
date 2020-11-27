@@ -1,7 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
+#include <SFML/Network.hpp>
 #include "./game/gamelogic.cpp"
+#include "./network/client.cpp"
 #include <math.h>
 #include <iostream>
 #include <vector>
@@ -11,7 +13,24 @@ using namespace sf;
 
 int main()
 {
-	// All class objects
+	
+    std::cout << "Welcome to TDR" << std::endl;
+
+    // /* THIS CODE HERE IS THE SET UP FOR THE GAME */
+    std::string ip;
+    int port;
+
+    std::cout << "Enter IP Address: ";
+    std::cin >> ip;
+    std::cout << "Enter Port Number: ";
+    std::cin >> port;
+
+    std::cout << "Connecting to IP address: " << ip << "" << port << std::endl;
+    //connect();
+    
+    /* THIS CODE HERE IS FOR ONCE THE GAME START */
+    
+    // All class objects
 	GameMap map;
 	GameEngine eng;
 	Map_Element w;
@@ -108,7 +127,6 @@ int main()
 			}
 		}
 
-		shooting
 		if(firerate > 0) firerate--;
 		if (Mouse::isButtonPressed(Mouse::Left) && (firerate == 0))
 		{
@@ -155,7 +173,7 @@ int main()
 		//draw enemies, player, bullets
 		window.clear();
 		for (size_t i = 0; i < enemies.size(); i++) window.draw(enemies[i]);
-		window.draw(p.box);
+		window.draw(p.box); // this will be changed to update all players
 		for (size_t i = 0; i < bullets.size(); i++) window.draw(bullets[i].shape);
 		for (size_t i = 0; i < walls.size(); i++) window.draw(walls[i].wall);
 		window.display();

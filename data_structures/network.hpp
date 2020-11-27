@@ -17,7 +17,7 @@ struct Playerinfo{
     sf::Vector2f bullet_direction;
 };
 
-struct Player{
+struct Playerupdate{
     int playerid;
     float health;
     Playerinfo posinfo;
@@ -27,7 +27,7 @@ struct Player{
 struct Gameinfo{
     int num_players; //used so client knows how many playerinfos to expect.
     int client_id; //used so client knows which player in the vector is itself.
-    std::vector<Player> players;
+    std::vector<Playerupdate> players;
 };
 
 void print_playerinfo(Playerinfo info);
