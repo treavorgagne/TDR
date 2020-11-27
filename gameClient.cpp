@@ -19,7 +19,7 @@ int main()
     // /* THIS CODE HERE IS THE SET UP FOR THE GAME */
     std::string ip;
     int port;
-	ClientCommunicator client;
+    ClientCommunicator client;
 
     std::cout << "Enter IP Address: ";
     std::cin >> ip;
