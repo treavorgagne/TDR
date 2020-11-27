@@ -10,14 +10,14 @@ server.o: server.cpp
 client.o: client.cpp
 	$(CC) -c client.cpp
 
-packet_overloads.o: packet_overloads.cpp
-	$(CC) -c packet_overloads.cpp
+playerinfo.o: playerinfo.cpp
+	$(CC) -c playerinfo.cpp
 
-server: server.o
-	$(CC) -o server.run server.o packet_overloads.o $(CFLAGS) $(LIBS)
+server: server.o playerinfo.o
+	$(CC) -o server.run server.o playerinfo.o $(CFLAGS) $(LIBS)
 
-client: client.o
-	$(CC) -o client.run client.o packet_overloads.o $(CFLAGS) $(LIBS)
+client: client.o playerinfo.o
+	$(CC) -o client.run client.o playerinfo.o $(CFLAGS) $(LIBS)
 
 
 clean:

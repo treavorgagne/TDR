@@ -43,3 +43,15 @@ void print_playerinfo(Playerinfo info){
             info.bullet_direction.y);
 
 }
+
+sf::Packet& operator >>(sf::Packet& packet, Gameinitializer& metadata){
+    return packet >> metadata.client_id >> metadata.spawn_location;
+};
+sf::Packet& operator <<(sf::Packet& packet, Gameinitializer& metadata){
+    return packet << metadata.client_id << metadata.spawn_location;
+};
+
+void print_metadata(Gameinitializer metadata){
+    printf("Client id: %d\n", metadata.client_id);
+    printf("Spawn location (x,y): %.2f, %.2f\n", metadata.spawn_location.first, metadata.spawn_location.second);
+}

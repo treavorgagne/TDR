@@ -31,6 +31,11 @@ struct Gameinfo{
     std::vector<Playerupdate> players;
 };
 
+struct Gameinitializer{
+    std::pair<float, float> spawn_location;
+    int client_id;
+};
+
 void print_playerinfo(Playerinfo info);
 
 //includes overloads
@@ -54,3 +59,10 @@ sf::Packet& operator >>(sf::Packet& packet, Playerupdate& info);
 //overloads for gameinfo
 sf::Packet& operator <<(sf::Packet& packet, Gameinfo& info);
 sf::Packet& operator >>(sf::Packet& packet, Gameinfo& info);
+
+//overloads for gameinit
+sf::Packet& operator <<(sf::Packet& packet, Gameinitializer& info);
+sf::Packet& operator >>(sf::Packet& packet, Gameinitializer& info);
+
+
+void print_metadata(Gameinitializer metadata);

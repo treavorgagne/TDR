@@ -1,5 +1,9 @@
 
 #include "network.hpp"
+#include <SFML/Network/Packet.hpp>
+#include <SFML/Network/Socket.hpp>
+#include <SFML/Network/TcpSocket.hpp>
+#include <utility>
 
 
 
@@ -21,10 +25,12 @@ int ServerCommunicator::wait_for_players(int playercount){
                         clients.push_back(client); //add client to connections
                         std::cout << "New connection received from " << client->getRemoteAddress() << ":" <<
                             client->getRemotePort() << std::endl;
+                        std::cout << "Assigned player id: " << num_players << std::endl;
 
                         selector.add(*client); //add client to selector
                         num_players++;
                         std::cout << "Players connected: " << num_players << std::endl;
+
 
                 }
                 else{
@@ -44,6 +50,30 @@ int ServerCommunicator::wait_for_players(int playercount){
     return 0;
 }
 
+int ServerCommunicator::send_game_metadata(int clientid, float spawnx, float spawny){
+
+    Gameinitializer metadata;
+
+    metadata.client_id = clientid;
+
+    metadata.spawn_location.first = spawnx;
+    metadata.spawn_location.second = spawny;
+
+    sf::Packet packet;
+
+    packet << metadata;
+
+    //this is hacky but hopefully sends to the correct client
+    std::list<sf::TcpSocket*>::iterator ptr;
+    for (int i=0; ptr=clients.begin(), i<clientid; i++, ptr++);
+
+    sf::TcpSocket& client = **ptr;
+
+    client.send(packet);
+
+    return 0;
+}
+
 int ServerCommunicator::broadcast_game_info(Gameinfo info){
     //send each client the game information
 
@@ -51,6 +81,7 @@ int ServerCommunicator::broadcast_game_info(Gameinfo info){
     for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it){
         sf::TcpSocket& client = **it;
 
+        //TODO: BUILT THESE OVERLOADS
         //packet << info;
 
         if(client.send(packet) != sf::Socket::Done){
