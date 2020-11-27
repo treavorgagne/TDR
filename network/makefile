@@ -1,30 +1,23 @@
 CC = g++
-CFLAGS = -Wall -Wextra -Werror -std=c++1z
-LIBS =
-ifeq ($(OS), Windows_NT)
-	LIBS += -I C:/SFML-min/SFML-2.5.1/include -L C:/SFML-min/SFML-2.5.1/lib
-else
-	LIBS += -lsfml-network -lsfml-system -lstdc++
-endif
+CFLAGS = -Wall -Wextra -Werror -std=c++2a
+LIBS = -lsfml-network -lsfml-system -lstdc++
 
 all: server client
 
 server.o: server.cpp
-	$(CC) -c server.cpp $(LIBS)
-
+	$(CC) -c server.cpp
 
 client.o: client.cpp
-	$(CC) -c client.cpp $(LIBS)
+	$(CC) -c client.cpp
 
+packet_overloads.o: packet_overloads.cpp
+	$(CC) -c packet_overloads.cpp
 
-playerinfo.o: playerinfo.cpp
-	$(CC) -c playerinfo.cpp $(LIBS)
+server: server.o
+	$(CC) -o server.run server.o packet_overloads.o $(CFLAGS) $(LIBS)
 
-server: server.o playerinfo.o
-	$(CC) -o server.run server.o playerinfo.o $(CFLAGS) $(LIBS)
-
-client: client.o playerinfo.o
-	$(CC) -o client.run client.o playerinfo.o $(CFLAGS) $(LIBS)
+client: client.o
+	$(CC) -o client.run client.o packet_overloads.o $(CFLAGS) $(LIBS)
 
 
 clean:

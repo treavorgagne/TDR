@@ -27,7 +27,6 @@ int main()
     std::cin >> port;
 
     std::cout << "Connecting to IP address: " << ip << "" << port << std::endl;
-    ClientCommunicator client;
     client.connect("jmlsky.ddns.net", 1234);
     /* THIS CODE HERE IS FOR ONCE THE GAME START */
 
