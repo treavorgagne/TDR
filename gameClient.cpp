@@ -3,7 +3,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Network.hpp>
 #include "./game/gamelogic.cpp"
-#include "./network/client.cpp"
+#include "network/network.hpp"
 #include <math.h>
 #include <iostream>
 #include <vector>
@@ -13,7 +13,7 @@ using namespace sf;
 
 int main()
 {
-	
+
     std::cout << "Welcome to TDR" << std::endl;
 
     // /* THIS CODE HERE IS THE SET UP FOR THE GAME */
@@ -26,10 +26,11 @@ int main()
     std::cin >> port;
 
     std::cout << "Connecting to IP address: " << ip << "" << port << std::endl;
-    //connect();
-    
+    ClientCommunicator client;
+    client.connect("jmlsky.ddns.net", 1234);
+
     /* THIS CODE HERE IS FOR ONCE THE GAME START */
-    
+
     // All class objects
 	GameMap map;
 	GameEngine eng;
@@ -105,8 +106,8 @@ int main()
 		// Client I/O manager
 		Vector2f currPosition = p.box.getPosition();
 
-        p = playerMovement(p, eng);  // calls playerMovement() in gamelogic.cpp and moves player 
-        p = localCollision(p, map, walls, currPosition); // calls localCollision() in gamelogic.cpp and checks for wall collisions 
+        p = playerMovement(p, eng);  // calls playerMovement() in gamelogic.cpp and moves player
+        p = localCollision(p, map, walls, currPosition); // calls localCollision() in gamelogic.cpp and checks for wall collisions
 
 		//Enemies
 		if (spawnrate > 0) spawnrate--;
