@@ -1,32 +1,7 @@
 
-#include <SFML/Network/Packet.hpp>
-#include <SFML/Network/Socket.hpp>
-#include <SFML/Network/TcpSocket.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <iostream>
-
-#include <SFML/Network.hpp>
-
-#include <chrono>
-
-#include <thread>
-
-#include <string>
-
-#include "../data_structures/network.hpp"
+#include "network.hpp"
 
 
-class ClientCommunicator {
-
-    sf::TcpSocket conn;
-    bool connected;
-
-    public:
-        int connect(std::string ip, int port);
-        int send_info(Playerinfo info);
-        Gameinfo receive_gameinfo();
-
-};
 
 int ClientCommunicator::connect(std::string ip, int port){
     if(conn.connect(ip, port) != sf::Socket::Done){

@@ -34,6 +34,8 @@ struct Gameinfo{
 void print_playerinfo(Playerinfo info);
 
 //includes overloads
+//
+//overloads for playerinfo
 sf::Packet& operator <<(sf::Packet& packet, sf::Vector2f& vec);
 sf::Packet& operator >>(sf::Packet& packet, sf::Vector2f& vec);
 sf::Packet& operator <<(sf::Packet& packet, std::pair<float, float>& position);
@@ -42,3 +44,13 @@ sf::Packet& operator <<(sf::Packet& packet, MovementDirection& direction);
 sf::Packet& operator >>(sf::Packet& packet, MovementDirection& direction);
 sf::Packet& operator <<(sf::Packet& packet, Playerinfo& info);
 sf::Packet& operator >>(sf::Packet& packet, Playerinfo& info);
+
+
+//overloads for playerupdate
+sf::Packet& operator <<(sf::Packet& packet, Playerupdate& info);
+sf::Packet& operator >>(sf::Packet& packet, Playerupdate& info);
+
+
+//overloads for gameinfo
+sf::Packet& operator <<(sf::Packet& packet, Gameinfo& info);
+sf::Packet& operator >>(sf::Packet& packet, Gameinfo& info);
