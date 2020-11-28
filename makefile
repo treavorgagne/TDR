@@ -28,4 +28,4 @@ playerinfo.o: network/playerinfo.cpp
 	$(CC) -c network/playerinfo.cpp $(CFLAGS) $(INC)
 
 clean:
-	rm gameClient.o gameClient.exe
+	rm gameClient.o gameClient.exe client.o playerinfo.o
