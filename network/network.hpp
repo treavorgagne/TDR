@@ -24,8 +24,9 @@ class ClientCommunicator {
 
     public:
         int connect(std::string ip, int port);
-        int send_info(Playerinfo info);
+        int send_playerinfo(Playerinfo info);
         Gameinfo receive_gameinfo();
+        Gameinitializer receive_spawn();
 
 };
 

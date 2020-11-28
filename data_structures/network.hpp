@@ -9,7 +9,8 @@
 
 //used for sending position and gunshots from client to server
 //also used by server to represent each player to client
-struct Playerinfo{
+struct Playerinfo{ //type 0
+    int type;
     std::pair<float, float> position;
     bool moving;
     MovementDirection direction;
@@ -18,6 +19,7 @@ struct Playerinfo{
 };
 
 struct Playerupdate{
+    int type; //type 1
     int playerid;
     float health;
     Playerinfo posinfo;
@@ -25,6 +27,7 @@ struct Playerupdate{
 
 //Distributed by the server to all players minimum 4x a second
 struct Gameinfo{
+    int type; //type 2
     int success; //If the client failed to recieve a packet, it must set this to 1 so it is ignored
     int num_players; //used so client knows how many playerinfos to expect.
     int client_id; //used so client knows which player in the vector is itself.
@@ -32,10 +35,12 @@ struct Gameinfo{
 };
 
 struct Gameinitializer{
+    int type; //type 3
     std::pair<float, float> spawn_location;
     int client_id;
 };
 
+int packet_type(sf::Packet packet);
 void print_playerinfo(Playerinfo info);
 
 //includes overloads

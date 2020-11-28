@@ -35,7 +35,8 @@ int ServerCommunicator::wait_for_players(int playercount){
                 }
                 else{
                     std::cout << "Error connecting to a client" << std::endl;
-                    delete client;
+                    listener.close();
+                    exit(1);
                 }
             }
         }
@@ -50,11 +51,11 @@ int ServerCommunicator::wait_for_players(int playercount){
     return 0;
 }
 
-int ServerCommunicator::send_game_metadata(int clientid, float spawnx, float spawny){
+int ServerCommunicator::send_game_metadata(int client_id, float spawnx, float spawny){
 
     Gameinitializer metadata;
 
-    metadata.client_id = clientid;
+    metadata.client_id = client_id;
 
     metadata.spawn_location.first = spawnx;
     metadata.spawn_location.second = spawny;
@@ -65,7 +66,13 @@ int ServerCommunicator::send_game_metadata(int clientid, float spawnx, float spa
 
     //this is hacky but hopefully sends to the correct client
     std::list<sf::TcpSocket*>::iterator ptr;
-    for (int i=0; ptr=clients.begin(), i<clientid; i++, ptr++);
+
+    ptr = clients.begin();
+
+    for(int i=0; i < client_id; i++){
+        ptr++;
+    }
+
 
     sf::TcpSocket& client = **ptr;
 
@@ -121,12 +128,21 @@ int ServerCommunicator::accept_inputs(){
 
                 if (status == sf::Socket::Done){
                     //extract packet
-                    Playerinfo info;
-
-                    packet >> info;
-
                     std::cout << "Packet recieved from client on port: " << client.getRemotePort() << std::endl;
-                    print_playerinfo(info);
+
+                    int type = packet_type(packet);
+                    std::cout << "packet type is: " << type << std::endl;
+
+                    if(type == 0){
+                        Playerinfo info;
+                        packet >> info;
+                        print_playerinfo(info);
+                    }
+                    else {
+                        std::cout << "Unkown packet type" << std::endl;
+                    }
+
+
                     printf("\n");
                 }
                 else if(status == sf::Socket::Disconnected){
@@ -158,7 +174,10 @@ int main(){
      comm.start(35020);
 
      if(comm.wait_for_players(2) == 0){
-        std::cout << "all players have connected!" << std::endl;
+        std::cout << "All players have connected!" << std::endl;
+        std::cout << "Sending spawn locations" << std::endl;
+        comm.send_game_metadata(0, 30, 30);
+        comm.send_game_metadata(1, 560, 560);
         comm.accept_inputs();
      }
 

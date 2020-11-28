@@ -1,4 +1,5 @@
 #include <SFML/Network.hpp>
+#include <SFML/Network/Packet.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdio>
 
@@ -29,10 +30,10 @@ sf::Packet& operator >>(sf::Packet& packet, MovementDirection& direction){
 };
 
 sf::Packet& operator <<(sf::Packet& packet, Playerinfo& info){
-    return packet << info.position << info.moving << info.direction << info.bullet_fired << info.bullet_direction;
+    return packet << 0 << info.position << info.moving << info.direction << info.bullet_fired << info.bullet_direction;
 };
 sf::Packet& operator >>(sf::Packet& packet, Playerinfo& info){
-    return packet >> info.position >> info.moving >> info.direction >> info.bullet_fired >> info.bullet_direction;
+    return packet >> info.type >> info.position >> info.moving >> info.direction >> info.bullet_fired >> info.bullet_direction;
 };
 
 void print_playerinfo(Playerinfo info){
@@ -45,13 +46,20 @@ void print_playerinfo(Playerinfo info){
 }
 
 sf::Packet& operator >>(sf::Packet& packet, Gameinitializer& metadata){
-    return packet >> metadata.client_id >> metadata.spawn_location;
+    return packet >> metadata.type >> metadata.client_id >> metadata.spawn_location;
 };
 sf::Packet& operator <<(sf::Packet& packet, Gameinitializer& metadata){
-    return packet << metadata.client_id << metadata.spawn_location;
+    return packet << 1 << metadata.client_id << metadata.spawn_location;
 };
 
 void print_metadata(Gameinitializer metadata){
     printf("Client id: %d\n", metadata.client_id);
     printf("Spawn location (x,y): %.2f, %.2f\n", metadata.spawn_location.first, metadata.spawn_location.second);
+}
+
+// returns the packet type so server/client know what to use to recieve it
+int packet_type(sf::Packet packet){
+    Playerinfo info;
+    packet >> info;
+    return info.type;
 }
