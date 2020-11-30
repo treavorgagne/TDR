@@ -85,9 +85,10 @@ public:
 	int killCount;
 	bool alive;
 	int walk;
+	int lives;
 
 	Player()
-		: username("Nolan"), player_id(-1), killCount(0), alive(true), walk(0)
+		: username("Nolan"), player_id(-1), killCount(0), alive(true), walk(0), lives(5)
 	{
 		this->box.setSize(Vector2f(35.0f, 35.0f));
 		this->box.setPosition(50, 50);
