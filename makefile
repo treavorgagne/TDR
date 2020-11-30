@@ -7,16 +7,22 @@ ifeq ($(OS), Windows_NT)
 	LIBS +=-L C:/SFML-min/SFML-2.5.1/lib
 	INC += -I C:/SFML-min/SFML-2.5.1/include
 endif
-	
+
 LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lsfml-audio -lstdc++
 
-all: client
+all: client server
+
+server: gameServer.o server.o playerinfo.o
+	$(CC) -o gameServer.exe gameServer.o server.o playerinfo.o $(LIBS)
 
 client: gameClient.o client.o playerinfo.o
 	$(CC) -o gameClient.exe gameClient.o client.o playerinfo.o $(LIBS)
 
 gameClient.o: gameClient.cpp
 	$(CC) -c gameClient.cpp $(CFLAGS) $(INC)
+
+gameServer.o: gameServer.cpp
+	$(CC) -c gameServer.cpp $(CFLAGS) $(INC)
 
 server.o: network/server.cpp
 	$(CC) -c network/server.cpp $(CFLAGS) $(INC)
