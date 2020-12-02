@@ -2,6 +2,8 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Network.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
 #include "./game/gamelogic.hpp"
 #include "network/network.hpp"
 #include <math.h>
@@ -10,6 +12,7 @@
 #include <cstdlib>
 #include <string>
 #include <unistd.h>
+#include "audio/SoundPlayer.hpp"
 
 using namespace sf;
 
@@ -29,6 +32,7 @@ int main()
 	Bullet b;
 	std::vector<Bullet> bullets;
 	ClientCommunicator client;
+	SoundPlayer playSound;
 	
 	std::string name;
 	std::string ip;
@@ -52,6 +56,9 @@ int main()
 		w.wall.setSize(Vector2f(map.wallWidthX[i], map.wallWidthY[i]));
 		walls.push_back(Map_Element(w));
 	}
+	
+
+
 
 	//vectors for aiming
 	Vector2f playerCenter;
@@ -126,6 +133,7 @@ int main()
 	player[player_id].username = name;
 
 	/* THIS CODE HERE IS FOR ONCE THE GAME START */
+	
 	printf("\n");
 	std::cout << "--GAME COUNTDOWN--" << std::endl;
 	std::cout << "--------5---------" << std::endl;
@@ -156,6 +164,7 @@ int main()
   				break;
 			}
 		}
+		
 
 		if( player[player_id].alive ){
 
@@ -209,6 +218,10 @@ int main()
 				bullets.push_back(Bullet(b));
 				firerate = eng.fireCap;
 				//audio pew pew
+				playSound.playWalk();
+						
+
+
 			}
 
 		}
@@ -223,6 +236,7 @@ int main()
 				if (bullets[i].shape.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) {
 					bullets.erase(bullets.begin() + i);
 					//audio thud
+					
 				}
 			}
 
