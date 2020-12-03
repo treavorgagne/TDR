@@ -6,6 +6,7 @@
 #include "network/network.hpp"
 #include <math.h>
 #include <iostream>
+#include <thread>
 #include <vector>
 #include <cstdlib>
 #include <string>
@@ -24,21 +25,103 @@ class Server{
     int set_spawns();
 
     public:
-        int setup_game(int port);
+        int setup_game(int port, int player_count);
         int start_game();
-        void render_game();//Used to observe the game from server(start in seperate thread if using)
+        void main_loop();
         int check_collisions();
         int fire_bullet(int player_id, Vector2f direction); //call if player send in bullet fired flag
+        void input_loop();
         int respawn_dead_players();
 };
 
+void Server::input_loop(){
+    std::cout << "Now accepting inputs" << std::endl;
+    printf("\n");
+    comm.selector.remove(comm.listener); //remove listener to reject new connections
+    comm.listener.close();
+
+    while(true){
+        //iterate through the connections and check for data
+        if (comm.clients.size() == 0){
+            std::cout << "All clients disconnected" << std::endl;
+            exit(1);
+        }
 
 
-void Server::render_game(){
-    RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),"TDR", (sf::Style::Titlebar | sf::Style::Close));
+        comm.selector.wait(); //wait for a socket to be ready
+
+        for (std::list<sf::TcpSocket*>::iterator it = comm.clients.begin(); it != comm.clients.end(); ++it){
+
+            sf::TcpSocket& client = **it;
+
+            if (comm.selector.isReady(client)){
+                // This client has sent some data, we can receive it
+                sf::Packet packet;
+                sf::Socket::Status status = client.receive(packet);
+
+                if (status == sf::Socket::Done){
+                    //extract packet
+                    std::cout << "Packet recieved from client on port: " << client.getRemotePort() << std::endl;
+
+                    int type = packet_type(packet);
+                    std::cout << "packet type is: " << type << std::endl;
+
+                    if(type == 0){
+                        Playerinfo info;
+                        packet >> info;
+                        print_playerinfo(info);
+                    }
+                    else {
+                        std::cout << "Unkown packet type" << std::endl;
+                    }
+
+
+                    printf("\n");
+                }
+                else if(status == sf::Socket::Disconnected){
+                    std::cout << "Client has been disconnected" << std::endl;
+                    //code to remove client here
+                    comm.selector.remove(client);
+                    client.disconnect();
+                    it = comm.clients.erase(it);
+
+                    std::cout << "Clients remaining: " << comm.clients.size() << std::endl;
+
+                }
+                else{
+                    std::cout << "Error recieving data from client: " << status << std::endl;
+                }
+
+            }
+        }
+
+
+    }
+
+}
+
+
+void Server::main_loop(){
+    RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),
+                "TDR", (sf::Style::Titlebar | sf::Style::Close));
     window.setFramerateLimit(60);
+
+    //start thread to accept new inputs
+    //
+    std::thread inputs(&Server::input_loop, this);
+    //
+
     // update game
     while(1){
+        //Collisions
+        check_collisions();
+
+        //Send game updates
+
+
+        //
+
+        //render it
         window.clear();
         for (size_t i = 0; i < players.size(); i++){
                  if(players[i].alive) window.draw(players[i].box);
@@ -47,9 +130,12 @@ void Server::render_game(){
         for (size_t i = 0; i < walls.size(); i++) window.draw(walls[i].wall);
         window.display();
     }
+
+    inputs.join();
 }
+
 //setup and wait for players
-int Server::setup_game(int port){
+int Server::setup_game(int port, int player_count){
 
     // adds walls to map
     for (int i = 0; i < map.wallCount; i++) {
@@ -60,10 +146,38 @@ int Server::setup_game(int port){
 
     //wait for players to connect;
     comm.start(port);
-    comm.wait_for_players(2);
+    comm.wait_for_players(player_count);
+
+    //add players to game
+
+    for(int i=0; i<2; i++){
+        Player p;
+        p.alive = true;
+        p.lives = 2;
+        p.player_id = i;
+        p.username = i;
+        players.push_back(p);
+    }
+
+    //set textures
+    for(size_t i=0; i<players.size(); i++){
+        std::string num = std::to_string((int) (rand() % 24) + 1);
+        std::string skin = "media/";
+        std::string end = ".png";
+        skin.append(num);
+        skin.append(end);
+        std::cout << "Loading texture from file" << skin << std::endl;
+        players[i].boxTexture.loadFromFile(skin);
+        players[i].boxTexture.setSmooth(true);
+		players[i].box.setTexture(&players[i].boxTexture);
+		players[i].textureSize = players[i].boxTexture.getSize();
+		players[i].textureSize.x /= 4;
+		players[i].textureSize.y /= 4;
+		players[i].box.setTextureRect(IntRect(players[i].textureSize.x * 1, players[i].textureSize.y * 1,
+                    players[i].textureSize.x, players[i].textureSize.y));
+    }
     //set player spawns
     set_spawns();
-
 
     return 0;
 }
@@ -78,7 +192,6 @@ int Server::set_spawns(){
 
         players[player_id].player_id = player_id;
 
-        //TODO: SET SPAWN LOCATIONS BASED ON PLAYER ID(Verify this works)
         Vector2f pos = Vector2f((float) (rand() % (map.mapWidth-25)),
                 (float) (rand() % (map.mapHeight-25)));
 
@@ -163,12 +276,12 @@ int Server::fire_bullet(int player_id, Vector2f direction){
     return 0;
 };
 
+
 int main(){
     Server server;
-    server.setup_game(35020);
-//    std::thread render_loop(&Server::render_game, server);
+    server.setup_game(35020, 2);
 
+    server.main_loop();
 
-//    render_loop.join();
     return 0;
 }

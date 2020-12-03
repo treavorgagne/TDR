@@ -34,7 +34,9 @@ int main(){ //for tests
              info.direction = MovementDirection::left;
              print_playerinfo(info);
 
-             client.send_playerinfo(info);
+             if(client.send_playerinfo(info) != 0){
+                 exit(1);
+             };
 
 
 

@@ -9,7 +9,9 @@
 
 
 void ServerCommunicator::start (int port){
-    listener.listen(port);
+    if(listener.listen(port) == sf::Socket::Error){
+        exit(1);
+    }
     selector.add(listener);
     num_players = 0;
     std::cout << "Started server on port " << listener.getLocalPort() << std::endl;

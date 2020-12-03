@@ -6,6 +6,8 @@ INC =
 ifeq ($(OS), Windows_NT)
 	LIBS +=-L C:/SFML-min/SFML-2.5.1/lib
 	INC += -I C:/SFML-min/SFML-2.5.1/include
+else
+	LIBS += -pthread
 endif
 
 LIBS += -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lsfml-audio -lstdc++

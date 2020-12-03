@@ -8,7 +8,6 @@
 
 #include <chrono>
 
-#include <thread>
 
 #include <string>
 #include <iostream>
@@ -32,13 +31,13 @@ class ClientCommunicator {
 
 class ServerCommunicator {
 
-    sf::TcpListener listener;
-    std::list<sf::TcpSocket*> clients;
-    sf::SocketSelector selector;
     int num_players;
     int state; //0 == accepting connections, 1== playing game
 
     public:
+        sf::SocketSelector selector;
+        sf::TcpListener listener;
+        std::list<sf::TcpSocket*> clients;
         void start(int port);
         int wait_for_players(int playercount);
         int accept_inputs();
