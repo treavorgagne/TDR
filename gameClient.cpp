@@ -284,6 +284,8 @@ int main()
             info.bullet_fired = true;
             info.bullet_direction = last_bullet_velocity;
             bullet_fired = false;
+        }else{
+            info.bullet_fired = false;
         }
 
 
@@ -291,7 +293,9 @@ int main()
         info.position.first = pos.x;
         info.position.second = pos.y;
 
-        client.send_playerinfo(info);
+        if(client.send_playerinfo(info) != 0){
+            exit(1);
+        }
 
 		window.clear();
 		for (size_t i = 0; i < player.size(); i++){
