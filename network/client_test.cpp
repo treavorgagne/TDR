@@ -52,11 +52,6 @@ int main(){ //for tests
                 info.position.first -= 60;
              }
 
-
-
-             printf("Updated info after move:\n");
-             print_playerinfo(info);
-
          }
 
  }

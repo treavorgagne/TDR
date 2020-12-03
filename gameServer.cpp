@@ -40,8 +40,14 @@ int Server::update_player(Playerinfo info, int client){
     printf("Client %d\n", client);
     print_playerinfo(info);
 
-    players[client].box.setPosition(info.position.first, info.position.second);
+    Bullet b;
 
+	Vector2f PlayerCenter = Vector2f(players[client].box.getPosition().x, players[client].box.getPosition().y);
+    b.shape.setPosition(PlayerCenter);
+    b.currVelocity = info.bullet_direction;
+    b.owner = client;
+    bullets.push_back(Bullet(b));
+    players[client].box.setPosition(info.position.first, info.position.second);
 
 
     return 0;

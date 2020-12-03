@@ -16,7 +16,7 @@ using namespace sf;
 int main()
 {
 	// /* THIS CODE HERE IS THE SET UP FOR THE GAME */
-	
+
 	// All Objects needed for game
 	int player_id = 0;
 	int firerate = 0;
@@ -29,11 +29,14 @@ int main()
 	Bullet b;
 	std::vector<Bullet> bullets;
 	ClientCommunicator client;
-	
+
 	std::string name;
 	std::string ip;
     int port;
 
+    bool bullet_fired = false;
+    Vector2f last_bullet_velocity;
+    /*
 	std::cout << "Welcome to TDR" << std::endl;
 	std::cout << "Enter Username (no spaces) : ";
 	std::cin >> name;
@@ -43,7 +46,9 @@ int main()
     std::cin >> port;
     std::cout << "Connecting to IP address: " << ip << " And Port Number: " << port << std::endl;
     client.connect(ip, port);
-	
+    */
+    client.connect("127.0.0.1", 35020);
+
 	srand((unsigned int) time(NULL));
 
 	// adds walls to map
@@ -69,10 +74,10 @@ int main()
 
 	RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),"TDR", (sf::Style::Titlebar | sf::Style::Close));
 	window.setFramerateLimit(60);
-	
+
 	Cursor cursor;
 	if (cursor.loadFromSystem(Cursor::Cross)) window.setMouseCursor(cursor);
-	
+
 
 	std::cout << "Going into pre-game lobby to wait for the remaining players to join:" << std::endl;
 	while(player.size() < 3){
@@ -193,7 +198,7 @@ int main()
 				}
 			}
 
-			// client firing vectorizing and shooting 
+			// client firing vectorizing and shooting
 			playerCenter = Vector2f(player[player_id].box.getPosition().x, player[player_id].box.getPosition().y);
 			mousePosWindow = Vector2f(Mouse::getPosition(window));
 			aimDir = mousePosWindow - playerCenter;
@@ -201,18 +206,21 @@ int main()
 			aimDirNorm = aimDir / d;
 
 			if(firerate > 0) firerate--;
+
 			if (Mouse::isButtonPressed(Mouse::Left) && (firerate == 0))
 			{
 				b.shape.setPosition(playerCenter);
 				b.currVelocity = aimDirNorm * eng.BulletSpeed;
+                last_bullet_velocity = b.currVelocity;
 				b.owner = player_id;
 				bullets.push_back(Bullet(b));
 				firerate = eng.fireCap;
+                bullet_fired=true;
 				//audio pew pew
 			}
 
 		}
-		
+
 
 		// server side collision checker
 		for (size_t i = 0; i < bullets.size(); i++) {
@@ -249,11 +257,11 @@ int main()
 			}
 		}
 
-		//respawn player 
-		for (size_t i = 0; i < player.size(); i++){ 
+		//respawn player
+		for (size_t i = 0; i < player.size(); i++){
 
 			 if(!player[i].alive && player[i].lives > 0){
-				// respawn; 
+				// respawn;
 				bool spw = true;
 				Vector2f pos = Vector2f((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
 				player[i].box.setPosition(pos);
@@ -265,10 +273,26 @@ int main()
 					player[i].alive = true;
 				}
 
-			 } 
+			 }
 		}
 
 		// update game
+        //
+        Playerinfo info;
+
+        if (bullet_fired){
+            info.bullet_fired = true;
+            info.bullet_direction = last_bullet_velocity;
+            bullet_fired = false;
+        }
+
+
+        Vector2f pos = player[player_id].box.getPosition();
+        info.position.first = pos.x;
+        info.position.second = pos.y;
+
+        client.send_playerinfo(info);
+
 		window.clear();
 		for (size_t i = 0; i < player.size(); i++){
 			 if(player[i].alive) window.draw(player[i].box);
