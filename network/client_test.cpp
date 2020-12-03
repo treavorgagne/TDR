@@ -1,6 +1,9 @@
 
 #include "network.hpp"
 
+#include <chrono>
+#include <thread>
+
 int main(){ //for tests
 
          ClientCommunicator client;
@@ -18,29 +21,41 @@ int main(){ //for tests
 
          printf("\n");
 
+         Playerinfo info;
+         info.position.first = spawn.spawn_location.first;
+         info.position.second = spawn.spawn_location.second;
+         info.bullet_fired = true;
+         info.bullet_direction = sf::Vector2f(23, 21.2);
+         info.moving = false;
+         info.direction = MovementDirection::left;
 
+         int counter = 0;
+
+        //walk left and right quickly(sync to 60 sends/s)
          while(1){
-             std::this_thread::sleep_for(std::chrono::seconds(2));
-
+             std::this_thread::sleep_for(std::chrono::milliseconds(17));
 
              std::cout << "Sending sample position info:" << std::endl;
 
-             Playerinfo info;
-             info.position.first = 24.5;
-             info.position.second = 30;
-             info.bullet_fired = true;
-             info.bullet_direction = sf::Vector2f(23, 21.2);
-             info.moving = false;
-             info.direction = MovementDirection::left;
              print_playerinfo(info);
 
              if(client.send_playerinfo(info) != 0){
                  exit(1);
              };
 
+             counter++;
+
+             if(counter < 60){
+                info.position.first += 1;
+             }else if(counter > 60){
+                counter = 0;
+                info.position.first -= 60;
+             }
 
 
-             printf("\n");
+
+             printf("Updated info after move:\n");
+             print_playerinfo(info);
 
          }
 

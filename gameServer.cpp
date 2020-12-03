@@ -23,6 +23,7 @@ class Server{
     ServerCommunicator comm;
 
     int set_spawns();
+    int update_player(Playerinfo info, int client);
 
     public:
         int setup_game(int port, int player_count);
@@ -33,6 +34,18 @@ class Server{
         void input_loop();
         int respawn_dead_players();
 };
+
+
+int Server::update_player(Playerinfo info, int client){
+    printf("Client %d\n", client);
+    print_playerinfo(info);
+
+    players[client].box.setPosition(info.position.first, info.position.second);
+
+
+
+    return 0;
+}
 
 void Server::input_loop(){
     std::cout << "Now accepting inputs" << std::endl;
@@ -49,7 +62,7 @@ void Server::input_loop(){
 
 
         comm.selector.wait(); //wait for a socket to be ready
-
+        int client_no = 0;
         for (std::list<sf::TcpSocket*>::iterator it = comm.clients.begin(); it != comm.clients.end(); ++it){
 
             sf::TcpSocket& client = **it;
@@ -69,7 +82,7 @@ void Server::input_loop(){
                     if(type == 0){
                         Playerinfo info;
                         packet >> info;
-                        print_playerinfo(info);
+                        update_player(info, client_no);
                     }
                     else {
                         std::cout << "Unkown packet type" << std::endl;
@@ -93,6 +106,8 @@ void Server::input_loop(){
                 }
 
             }
+
+          client_no++;
         }
 
 
