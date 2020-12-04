@@ -268,7 +268,7 @@ int Server::respawn_dead_players(){
 
     //respawn all players that are dead and have lives left
     for (size_t i = 0; i < players.size(); i++){
-        if(!players[i].alive && players[i].lives > 0){
+        while(!players[i].alive && players[i].lives > 0){
             bool spw = true;
             Vector2f pos = Vector2f((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
             players[i].box.setPosition(pos);
@@ -278,7 +278,6 @@ int Server::respawn_dead_players(){
             if (spw == true) {
                 players[i].alive = true;
             }
-
          }
     }
 

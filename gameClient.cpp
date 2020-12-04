@@ -13,30 +13,32 @@
 
 using namespace sf;
 
-int main()
-{
-	// /* THIS CODE HERE IS THE SET UP FOR THE GAME */
+class Client{
 
-	// All Objects needed for game
-	int player_id = 0;
-	int firerate = 0;
+    int player_id = 0;
+	
 	GameMap map;
 	GameEngine eng;
 	Map_Element w;
-	std::vector<Map_Element> walls;
-	Player p;
-	std::vector<Player> player;
 	Bullet b;
+	Player p;
+	std::vector<Map_Element> walls;
+	std::vector<Player> player;
 	std::vector<Bullet> bullets;
 	ClientCommunicator client;
 
-	std::string name;
-	std::string ip;
-    int port;
+    public:
+        void pre_game();
+		void game_loop();
+};
 
-    bool bullet_fired = false;
-    Vector2f last_bullet_velocity;
-    /*
+void Client::pre_game(){
+
+	std::string name;
+	//std::string ip;
+    //int port;
+
+	/*
 	std::cout << "Welcome to TDR" << std::endl;
 	std::cout << "Enter Username (no spaces) : ";
 	std::cin >> name;
@@ -58,12 +60,6 @@ int main()
 		walls.push_back(Map_Element(w));
 	}
 
-	//vectors for aiming
-	Vector2f playerCenter;
-	Vector2f mousePosWindow;
-	Vector2f aimDir;
-	Vector2f aimDirNorm;
-
 	Gameinitializer spawn = client.receive_spawn();
 	std::cout << "Cliend_id: " <<spawn.client_id;
 	std::cout << "Waiting for response with game metadata" << std::endl;
@@ -71,13 +67,6 @@ int main()
 	// print_metadata(spawn);
 	// printf("\n");
 	player_id = spawn.client_id;
-
-	RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),"TDR", (sf::Style::Titlebar | sf::Style::Close));
-	window.setFramerateLimit(60);
-
-	Cursor cursor;
-	if (cursor.loadFromSystem(Cursor::Cross)) window.setMouseCursor(cursor);
-
 
 	std::cout << "Going into pre-game lobby to wait for the remaining players to join:" << std::endl;
 	while(player.size() < 3){
@@ -95,21 +84,6 @@ int main()
 		//p.username = name;
 		p.box.setPosition((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
 		player.push_back(Player(p));
-
-
-		Event e;
-		while (window.pollEvent(e))
-		{
-			switch (e.type)
-			{
-			case Event::Closed:
-				window.close();
-				break;
-			default:
-  				break;
-			}
-		}
-
 	}
 	// code to client player texture
 	std::string num = std::to_string( (int) (rand() % 24) + 1);
@@ -145,6 +119,24 @@ int main()
 	usleep(1000000);
 	std::cout << "------START-------" << std::endl;
 	printf("\n");
+}
+
+void Client::game_loop(){
+	//vectors for aiming
+	Vector2f playerCenter;
+	Vector2f mousePosWindow;
+	Vector2f aimDir;
+	Vector2f aimDirNorm;
+
+	bool bullet_fired = false;
+    Vector2f last_bullet_velocity;
+	int firerate = 0;
+
+	RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),"TDR", (sf::Style::Titlebar | sf::Style::Close));
+	window.setFramerateLimit(60);
+
+	Cursor cursor;
+	if (cursor.loadFromSystem(Cursor::Cross)) window.setMouseCursor(cursor);
 
 	while (window.isOpen()) // opens game window
 	{
@@ -221,8 +213,9 @@ int main()
 
 		}
 
+		
 
-		// server side collision checker
+		// all this code will be removed once the client games is finished
 		for (size_t i = 0; i < bullets.size(); i++) {
 			bullets[i].shape.move(bullets[i].currVelocity);
 
@@ -257,10 +250,10 @@ int main()
 			}
 		}
 
-		//respawn player
+		//will be removed once 
 		for (size_t i = 0; i < player.size(); i++){
 
-			 if(!player[i].alive && player[i].lives > 0){
+			while(!player[i].alive && player[i].lives > 0){
 				// respawn;
 				bool spw = true;
 				Vector2f pos = Vector2f((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
@@ -272,7 +265,6 @@ int main()
 				if (spw == true) {
 					player[i].alive = true;
 				}
-
 			 }
 		}
 
@@ -311,6 +303,15 @@ int main()
 		for (size_t i = 0; i < walls.size(); i++) window.draw(walls[i].wall);
 		window.display();
 	}
+}
+
+
+int main()
+{
+
+	Client c;
+	c.pre_game();
+	c.game_loop();
 
 	return 0;
 }
