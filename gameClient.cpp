@@ -32,17 +32,51 @@ class Client{
     Vector2f last_bullet_velocity;
 	bool bullet_fired;
 
+    //internal functions
+    void check_movement();
+    void check_bullet_fired(Vector2f mousepos);
+    void set_texture(int player_id, int texture);
+
     public:
         void pre_game();
 		void game_loop();
-        void check_movement();
-        void check_bullet_fired(Vector2f mousepos);
+        void initialize();
 };
 
-void Client::pre_game(){
+void Client::initialize(){
 
     bullet_fired = false;
     last_bullet_velocity = Vector2f(0, 0);
+
+    //Init RNG
+	srand((unsigned int) time(NULL));
+
+	// adds walls to map
+	for (int i = 0; i < map.wallCount; i++) {
+		w.wall.setPosition((float) map.wallPositionX[i], (float) map.wallPositionY[i]);
+		w.wall.setSize(Vector2f(map.wallWidthX[i], map.wallWidthY[i]));
+		walls.push_back(Map_Element(w));
+	}
+}
+
+void Client::set_texture(int id, int texture){
+	std::string skin = "media/";
+	std::string end = ".png";
+	skin.append(std::to_string(texture));
+	skin.append(end);
+	player[id].boxTexture.loadFromFile(skin);
+	player[id].boxTexture.setSmooth(true);
+	player[id].box.setTexture(&player[id].boxTexture);
+	player[id].textureSize = player[id].boxTexture.getSize();
+	player[id].textureSize.x /= 4;
+	player[id].textureSize.y /= 4;
+	player[id].box.setTextureRect(IntRect(player[id].textureSize.x * 0,
+                player[id].textureSize.y * 0, player[id].textureSize.x, player[id].textureSize.y));
+}
+
+
+void Client::pre_game(){
+
 
 	std::string name;
 	//std::string ip;
@@ -61,54 +95,32 @@ void Client::pre_game(){
     */
     client.connect("127.0.0.1", 35020);
 
-    //Init RNG
-	srand((unsigned int) time(NULL));
-
-	// adds walls to map
-	for (int i = 0; i < map.wallCount; i++) {
-		w.wall.setPosition((float) map.wallPositionX[i], (float) map.wallPositionY[i]);
-		w.wall.setSize(Vector2f(map.wallWidthX[i], map.wallWidthY[i]));
-		walls.push_back(Map_Element(w));
-	}
 
 	Gameinitializer spawn = client.receive_spawn();
-	std::cout << "Cliend_id: " <<spawn.client_id;
+	std::cout << "My player id: " << spawn.client_id << std::endl;
 	std::cout << "Waiting for response with game metadata" << std::endl;
-	std::cout << "Got my spawn information:" << std::endl;
+	std::cout << "Got my spawn information" << std::endl;
 	// print_metadata(spawn);
 	// printf("\n");
 	player_id = spawn.client_id;
 
 	std::cout << "Going into pre-game lobby to wait for the remaining players to join:" << std::endl;
-	while(player.size() < 3){
 
-		//receive other players information and push them back;
-		p.boxTexture.loadFromFile("media/25.png");
-		p.boxTexture.setSmooth(true);
-		p.box.setTexture(&p.boxTexture);
-		p.textureSize = p.boxTexture.getSize();
-		p.textureSize.x /= 4;
-		p.textureSize.y /= 4;
-		p.box.setTextureRect(IntRect(p.textureSize.x * 0, p.textureSize.y * 0, p.textureSize.x, p.textureSize.y));
-		//code to set player info and position
-		//p.player_id = spawn.client_id;
-		//p.username = name;
+    //make all the players and give them random spawns for now
+    //They will get updated locations later
+	while(player.size() < 3){
 		p.box.setPosition((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
 		player.push_back(Player(p));
 	}
-	// code to client player texture
-	std::string num = std::to_string( (int) (rand() % 24) + 1);
-	std::string skin = "media/";
-	std::string end = ".png";
-	skin.append(num);
-	skin.append(end);
-	player[player_id].boxTexture.loadFromFile(skin);
-	player[player_id].boxTexture.setSmooth(true);
-	player[player_id].box.setTexture(&player[player_id].boxTexture);
-	player[player_id].textureSize = player[player_id].boxTexture.getSize();
-	player[player_id].textureSize.x /= 4;
-	player[player_id].textureSize.y /= 4;
-	player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * 0, player[player_id].textureSize.y * 0, player[player_id].textureSize.x, player[player_id].textureSize.y));
+
+    //make everyone a zombie
+    for(size_t i=0; i<player.size(); i++){
+        set_texture(i, 25);
+    }
+    //re-set local user texture randomly
+	int num = (int) (rand() % 24) + 1;
+    set_texture(player_id, num);
+
 	//code to set player info and position
 	player[player_id].player_id = spawn.client_id;
 	player[player_id].username = name;
@@ -162,8 +174,11 @@ void Client::check_movement(){
     }
 
     if(change_text){
-        player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4),
-                player[player_id].textureSize.y * next_texture, player[player_id].textureSize.x, player[player_id].textureSize.y));
+        player[player_id].box.setTextureRect(
+                IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4),
+                player[player_id].textureSize.y * next_texture, player[player_id].textureSize.x,
+                player[player_id].textureSize.y)
+                );
 
     }
 
@@ -344,6 +359,7 @@ int main()
 {
 
 	Client c;
+    c.initialize();
 	c.pre_game();
 	c.game_loop();
 
