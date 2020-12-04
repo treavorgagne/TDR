@@ -16,7 +16,7 @@ using namespace sf;
 class Client{
 
     int player_id = 0;
-	
+
 	GameMap map;
 	GameEngine eng;
 	Map_Element w;
@@ -30,6 +30,8 @@ class Client{
     public:
         void pre_game();
 		void game_loop();
+        void check_movement();
+        void check_bullet_fired();
 };
 
 void Client::pre_game(){
@@ -51,6 +53,7 @@ void Client::pre_game(){
     */
     client.connect("127.0.0.1", 35020);
 
+    //Init RNG
 	srand((unsigned int) time(NULL));
 
 	// adds walls to map
@@ -121,6 +124,61 @@ void Client::pre_game(){
 	printf("\n");
 }
 
+void Client::check_movement(){
+			// Client I/O manager
+    Vector2f currPosition = player[player_id].box.getPosition();
+
+    unsigned int next_texture = player[player_id].textureSize.y;
+    bool change_text = false;
+
+
+    if (Keyboard::isKeyPressed(Keyboard::A)){
+        player[player_id].box.move(-eng.movementSpeed, 0.0f);
+        next_texture = 1;
+        change_text = true;
+    }
+    if (Keyboard::isKeyPressed(Keyboard::W)){
+        player[player_id].box.move(0.0f, -eng.movementSpeed);
+        next_texture = 3;
+        change_text = true;
+    }
+    if (Keyboard::isKeyPressed(Keyboard::D)){
+        player[player_id].box.move(eng.movementSpeed, 0.0f);
+        next_texture = 2;
+        change_text = true;
+    }
+    if (Keyboard::isKeyPressed(Keyboard::S)){
+        player[player_id].box.move(0.0f, eng.movementSpeed);
+        next_texture = 0;
+        change_text = true;
+    }
+
+    if(change_text){
+        player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4),
+                player[player_id].textureSize.y * next_texture, player[player_id].textureSize.x, player[player_id].textureSize.y));
+
+    }
+
+    if (player[player_id].box.getPosition().x < 0)
+        player[player_id].box.setPosition(0, player[player_id].box.getPosition().y);
+
+    if (player[player_id].box.getPosition().x > map.mapWidth)
+        player[player_id].box.setPosition((float) map.mapWidth, player[player_id].box.getPosition().y);
+
+    if (player[player_id].box.getPosition().y < 0)
+        player[player_id].box.setPosition(player[player_id].box.getPosition().x, 0);
+
+    if (player[player_id].box.getPosition().y > map.mapHeight)
+        player[player_id].box.setPosition(player[player_id].box.getPosition().x, (float) map.mapHeight);
+
+
+    for (size_t j = 0; j < walls.size(); j++) {
+        if (player[player_id].box.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) {
+            player[player_id].box.setPosition(currPosition);
+        }
+    }
+}
+
 void Client::game_loop(){
 	//vectors for aiming
 	Vector2f playerCenter;
@@ -156,39 +214,8 @@ void Client::game_loop(){
 
 		if( player[player_id].alive ){
 
-			// Client I/O manager
-			Vector2f currPosition = player[player_id].box.getPosition();
-			if (Keyboard::isKeyPressed(Keyboard::A))
-			{
-				player[player_id].box.move(-eng.movementSpeed, 0.0f);
-				player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4), player[player_id].textureSize.y * 1, player[player_id].textureSize.x, player[player_id].textureSize.y));
-			}
-			if (Keyboard::isKeyPressed(Keyboard::W))
-			{
-				player[player_id].box.move(0.0f, -eng.movementSpeed);
-				player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4), player[player_id].textureSize.y * 3, player[player_id].textureSize.x, player[player_id].textureSize.y));
-			}
-			if (Keyboard::isKeyPressed(Keyboard::D))
-			{
-				player[player_id].box.move(eng.movementSpeed, 0.0f);
-				player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4), player[player_id].textureSize.y * 2, player[player_id].textureSize.x, player[player_id].textureSize.y));
-			}
-			if (Keyboard::isKeyPressed(Keyboard::S))
-			{
-				player[player_id].box.move(0.0f, eng.movementSpeed);
-				player[player_id].box.setTextureRect(IntRect(player[player_id].textureSize.x * (player[player_id].walk++ % 4), player[player_id].textureSize.y * 0, player[player_id].textureSize.x, player[player_id].textureSize.y));
-			}
+            check_movement();
 
-			//Client I/O manager
-			if (player[player_id].box.getPosition().x < 0) player[player_id].box.setPosition(0, player[player_id].box.getPosition().y);
-			if (player[player_id].box.getPosition().x > map.mapWidth) player[player_id].box.setPosition((float) map.mapWidth, player[player_id].box.getPosition().y);
-			if (player[player_id].box.getPosition().y < 0) player[player_id].box.setPosition(player[player_id].box.getPosition().x, 0);
-			if (player[player_id].box.getPosition().y > map.mapHeight) player[player_id].box.setPosition(player[player_id].box.getPosition().x, (float) map.mapHeight);
-			for (size_t j = 0; j < walls.size(); j++) {
-				if (player[player_id].box.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) {
-					player[player_id].box.setPosition(currPosition);
-				}
-			}
 
 			// client firing vectorizing and shooting
 			playerCenter = Vector2f(player[player_id].box.getPosition().x, player[player_id].box.getPosition().y);
@@ -213,7 +240,7 @@ void Client::game_loop(){
 
 		}
 
-		
+
 
 		// all this code will be removed once the client games is finished
 		for (size_t i = 0; i < bullets.size(); i++) {
@@ -250,7 +277,7 @@ void Client::game_loop(){
 			}
 		}
 
-		//will be removed once 
+		//will be removed once
 		for (size_t i = 0; i < player.size(); i++){
 
 			while(!player[i].alive && player[i].lives > 0){
@@ -289,12 +316,13 @@ void Client::game_loop(){
             exit(1);
         }
 
+        /*
         Gameinfo game = client.receive_gameinfo();
 
         printf("Recieved this game information\n");
 
         print_gameinfo(game);
-
+        */
 		window.clear();
 		for (size_t i = 0; i < player.size(); i++){
 			 if(player[i].alive) window.draw(player[i].box);

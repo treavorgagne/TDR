@@ -164,14 +164,14 @@ void Server::main_loop(){
     std::thread inputs(&Server::input_loop, this);
     //
     //
-    int frame = 0;
+    //int frame = 0;
 
     // update game
     while(1){
         //Collisions
         check_collisions();
 
-        //Send game updates
+        /*//Send game updates
         Gameinfo info = make_gameinfo();
 
         frame++;
@@ -179,7 +179,7 @@ void Server::main_loop(){
             comm.broadcast_game_info(info);
         }
 
-        //
+        */
 
         //render it
         window.clear();
