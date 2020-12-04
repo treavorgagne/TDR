@@ -297,6 +297,12 @@ int main()
             exit(1);
         }
 
+        Gameinfo game = client.receive_gameinfo();
+
+        printf("Recieved this game information\n");
+
+        print_gameinfo(game);
+
 		window.clear();
 		for (size_t i = 0; i < player.size(); i++){
 			 if(player[i].alive) window.draw(player[i].box);

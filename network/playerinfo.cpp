@@ -79,7 +79,7 @@ sf::Packet& operator >>(sf::Packet& packet, Gameinfo& info){
         packet >> player;
         info.players.push_back(player);
     }
-    printf("Read out second stuff\n");
+
     for(int i=0; i<info.num_bullets; i++){
         Bulletupdate bullet;
         packet >> bullet;

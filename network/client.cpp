@@ -43,7 +43,7 @@ Gameinfo ClientCommunicator::receive_gameinfo(){
         exit(1);
     }
 
-    //packet >> info;
+    packet >> info;
 
     return info;
 }

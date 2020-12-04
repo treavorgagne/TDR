@@ -42,6 +42,7 @@ Gameinfo Server::make_gameinfo(){
 
     info.type = 2;
     info.num_players = (int)players.size();
+    info.num_bullets = (int)bullets.size();
 
     //get player positions
     for(int i=0; i<(int)players.size(); i++){
@@ -61,14 +62,14 @@ Gameinfo Server::make_gameinfo(){
         b.direction = bullets[i].currVelocity;
     }
 
-    std::cout << "Created a gameinfo to broadcast" << std::endl;
+    //print_gameinfo(info);
 
     return info;
 }
 
 int Server::update_player(Playerinfo info, int client){
-    printf("Client %d\n", client);
-    print_playerinfo(info);
+   // printf("Client %d\n", client);
+   // print_playerinfo(info);
 
     Bullet b;
 
@@ -112,10 +113,10 @@ void Server::input_loop(){
 
                 if (status == sf::Socket::Done){
                     //extract packet
-                    std::cout << "Packet recieved from client on port: " << client.getRemotePort() << std::endl;
+                    //std::cout << "Packet recieved from client on port: " << client.getRemotePort() << std::endl;
 
                     int type = packet_type(packet);
-                    std::cout << "packet type is: " << type << std::endl;
+                    //std::cout << "packet type is: " << type << std::endl;
 
                     if(type == 0){
                         Playerinfo info;
@@ -127,7 +128,6 @@ void Server::input_loop(){
                     }
 
 
-                    printf("\n");
                 }
                 else if(status == sf::Socket::Disconnected){
                     std::cout << "Client has been disconnected" << std::endl;
@@ -163,6 +163,8 @@ void Server::main_loop(){
     //
     std::thread inputs(&Server::input_loop, this);
     //
+    //
+    int frame = 0;
 
     // update game
     while(1){
@@ -170,7 +172,12 @@ void Server::main_loop(){
         check_collisions();
 
         //Send game updates
+        Gameinfo info = make_gameinfo();
 
+        frame++;
+        if(frame % 10 == 0){
+            comm.broadcast_game_info(info);
+        }
 
         //
 
