@@ -16,6 +16,7 @@ using namespace sf;
 class Client{
 
     int player_id = 0;
+	int firerate = 0;
 
 	GameMap map;
 	GameEngine eng;
@@ -27,14 +28,21 @@ class Client{
 	std::vector<Bullet> bullets;
 	ClientCommunicator client;
 
+    //for networking
+    Vector2f last_bullet_velocity;
+	bool bullet_fired;
+
     public:
         void pre_game();
 		void game_loop();
         void check_movement();
-        void check_bullet_fired();
+        void check_bullet_fired(Vector2f mousepos);
 };
 
 void Client::pre_game(){
+
+    bullet_fired = false;
+    last_bullet_velocity = Vector2f(0, 0);
 
 	std::string name;
 	//std::string ip;
@@ -172,6 +180,7 @@ void Client::check_movement(){
         player[player_id].box.setPosition(player[player_id].box.getPosition().x, (float) map.mapHeight);
 
 
+    //check for walls before moving
     for (size_t j = 0; j < walls.size(); j++) {
         if (player[player_id].box.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) {
             player[player_id].box.setPosition(currPosition);
@@ -179,16 +188,37 @@ void Client::check_movement(){
     }
 }
 
-void Client::game_loop(){
-	//vectors for aiming
+void Client::check_bullet_fired(Vector2f mousePosWindow){
+
 	Vector2f playerCenter;
-	Vector2f mousePosWindow;
 	Vector2f aimDir;
 	Vector2f aimDirNorm;
+    // client firing vectorizing and shooting
+    playerCenter = Vector2f(player[player_id].box.getPosition().x, player[player_id].box.getPosition().y);
+    aimDir = mousePosWindow - playerCenter;
+    float d = sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2));
+    aimDirNorm = aimDir / d;
 
-	bool bullet_fired = false;
-    Vector2f last_bullet_velocity;
-	int firerate = 0;
+    if(firerate > 0) firerate--;
+
+    if (Mouse::isButtonPressed(Mouse::Left) && (firerate == 0))
+    {
+        b.shape.setPosition(playerCenter);
+        b.currVelocity = aimDirNorm * eng.BulletSpeed;
+        last_bullet_velocity = b.currVelocity;
+        b.owner = player_id;
+        bullets.push_back(Bullet(b));
+        firerate = eng.fireCap;
+        bullet_fired=true;
+        //audio pew pew
+    }
+
+
+}
+
+void Client::game_loop(){
+	//vectors for aiming
+
 
 	RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),"TDR", (sf::Style::Titlebar | sf::Style::Close));
 	window.setFramerateLimit(60);
@@ -213,33 +243,9 @@ void Client::game_loop(){
 		}
 
 		if( player[player_id].alive ){
-
             check_movement();
-
-
-			// client firing vectorizing and shooting
-			playerCenter = Vector2f(player[player_id].box.getPosition().x, player[player_id].box.getPosition().y);
-			mousePosWindow = Vector2f(Mouse::getPosition(window));
-			aimDir = mousePosWindow - playerCenter;
-			float d = sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2));
-			aimDirNorm = aimDir / d;
-
-			if(firerate > 0) firerate--;
-
-			if (Mouse::isButtonPressed(Mouse::Left) && (firerate == 0))
-			{
-				b.shape.setPosition(playerCenter);
-				b.currVelocity = aimDirNorm * eng.BulletSpeed;
-                last_bullet_velocity = b.currVelocity;
-				b.owner = player_id;
-				bullets.push_back(Bullet(b));
-				firerate = eng.fireCap;
-                bullet_fired=true;
-				//audio pew pew
-			}
-
+            check_bullet_fired(Vector2f(Mouse::getPosition(window)));
 		}
-
 
 
 		// all this code will be removed once the client games is finished
