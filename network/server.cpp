@@ -87,17 +87,14 @@ int ServerCommunicator::broadcast_game_info(Gameinfo info){
     //send each client the game information
 
     sf::Packet packet;
-    int i=0;
     for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it){
         sf::TcpSocket& client = **it;
 
+        sf::Packet packet;
 
-        //TODO: BUILT THESE OVERLOADS
-        //packet << info;
-        info.num_players = num_players;
-        info.client_id = i;
+        packet << info;
 
-        i++;
+
         if(client.send(packet) != sf::Socket::Done){
             std::cout << "Failed to send gameinfo to: " << client.getRemotePort() << std::endl;
         }

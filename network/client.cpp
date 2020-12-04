@@ -40,7 +40,7 @@ Gameinfo ClientCommunicator::receive_gameinfo(){
 
     if(conn.receive(packet) != sf::Socket::Done){
         std::cout << "Error recieving game information from server" << std::endl;
-        info.success = 1;
+        exit(1);
     }
 
     //packet >> info;

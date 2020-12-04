@@ -30,11 +30,41 @@ class Server{
         int start_game();
         void main_loop();
         int check_collisions();
-        int fire_bullet(int player_id, Vector2f direction); //call if player send in bullet fired flag
         void input_loop();
         int respawn_dead_players();
+        Gameinfo make_gameinfo();
 };
 
+//package up the game information to send to everyone
+Gameinfo Server::make_gameinfo(){
+
+    Gameinfo info;
+
+    info.type = 2;
+    info.num_players = (int)players.size();
+
+    //get player positions
+    for(int i=0; i<(int)players.size(); i++){
+        Playerupdate p;
+        p.type = 1;
+        p.alive = players[i].alive;
+        p.posinfo = players[i].box.getPosition();
+
+        info.players.push_back(p);
+    }
+
+    //get bullet positions and velocities
+    for(int i=0; i<(int)bullets.size(); i++){
+        Bulletupdate b;
+        b.type = 4;
+        b.pos = bullets[i].shape.getPosition();
+        b.direction = bullets[i].currVelocity;
+    }
+
+    std::cout << "Created a gameinfo to broadcast" << std::endl;
+
+    return info;
+}
 
 int Server::update_player(Playerinfo info, int client){
     printf("Client %d\n", client);
@@ -285,19 +315,6 @@ int Server::check_collisions(){
 };
 
 
-int Server::fire_bullet(int player_id, Vector2f direction){
-
-    Player cur = players[player_id];
-    Vector2f pos = cur.box.getPosition();
-    Bullet b;
-
-    b.shape.setPosition(pos);
-    b.currVelocity = direction * eng.BulletSpeed;
-    b.owner = player_id;
-    bullets.push_back(Bullet(b));
-
-    return 0;
-};
 
 
 int main(){

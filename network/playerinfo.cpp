@@ -2,10 +2,13 @@
 #include <SFML/Network/Packet.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdio>
+#include <vector>
 
 #include "../data_structures/network.hpp"
 
-
+///////////////////////////////PLAYERINFO
+///////////////////////////////PLAYERINFO
+///////////////////////////////PLAYERINFO
 
 sf::Packet& operator <<(sf::Packet& packet, sf::Vector2f& vec){
     return packet << vec.x << vec.y;
@@ -45,6 +48,84 @@ void print_playerinfo(Playerinfo info){
 
 }
 
+///////////////////////////////GAMEINFO
+///////////////////////////////GAMEINFO
+///////////////////////////////GAMEINFO
+///////////////////////////////GAMEINFO
+
+sf::Packet& operator <<(sf::Packet& packet, Gameinfo& info){
+
+    packet << 2 << info.num_bullets << info.num_players;
+
+
+    for(int i=0; i<info.num_players; i++){
+        packet << info.players[i];
+    }
+    for(int i=0; i<info.num_bullets; i++){
+        packet << info.bullets[i];
+    }
+
+    return packet;
+}
+
+
+
+sf::Packet& operator >>(sf::Packet& packet, Gameinfo& info){
+
+    packet >> info.type >> info.num_bullets >> info.num_players;
+
+    for(int i=0; i<info.num_players; i++){
+        Playerupdate player;
+        packet >> player;
+        info.players.push_back(player);
+    }
+    printf("Read out second stuff\n");
+    for(int i=0; i<info.num_bullets; i++){
+        Bulletupdate bullet;
+        packet >> bullet;
+        info.bullets.push_back(bullet);
+    }
+
+    return packet;
+}
+
+void print_gameinfo(Gameinfo info){
+    printf("Number of players: %d\n", info.num_players);
+    printf("Number of bullets: %d\n", info.num_bullets);
+    printf("Player information: \n");
+    for(int i=0; i<(int)info.players.size(); i++){
+        printf("    Player: %d\n", i);
+        printf("        Alive: %d\n", info.players[i].alive);
+        printf("        Position: (%.2f, %.2f)\n", info.players[i].posinfo.x, info.players[i].posinfo.y);
+    }
+    printf("Bullet information: \n");
+    for(int i=0; i<(int)info.bullets.size(); i++){
+        printf("    Bullet: %d\n", i);
+        printf("        Position: (%.2f, %.2f)\n", info.bullets[i].pos.x, info.bullets[i].pos.y);
+        printf("        Direction: (%.2f, %.2f)\n", info.bullets[i].direction.x, info.bullets[i].direction.y);
+    }
+}
+///////////////////////////////PLAYERUPDATE & BULLETUPDATE
+///////////////////////////////PLAYERUPDATE & BULLETUPDATE
+///////////////////////////////PLAYERUPDATE & BULLETUPDATE
+///////////////////////////////PLAYERUPDATE & BULLETUPDATE
+sf::Packet& operator >>(sf::Packet& packet, Playerupdate& info){
+    return packet >> info.type >> info.alive >> info.posinfo;
+}
+sf::Packet& operator <<(sf::Packet& packet, Playerupdate& info){
+    return packet << 1 << info.alive << info.posinfo;
+}
+sf::Packet& operator <<(sf::Packet& packet, Bulletupdate& info){
+    return packet << 4 << info.pos << info.direction;
+}
+sf::Packet& operator >>(sf::Packet& packet, Bulletupdate& info){
+    return packet >> info.type >> info.pos >> info.direction;
+}
+
+///////////////////////////////SPAWNINFO
+///////////////////////////////SPAWNINFO
+///////////////////////////////SPAWNINFO
+///////////////////////////////SPAWNINFO
 sf::Packet& operator >>(sf::Packet& packet, Gameinitializer& metadata){
     return packet >> metadata.type >> metadata.client_id >> metadata.spawn_location;
 };
