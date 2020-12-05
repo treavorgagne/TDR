@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include "audio/SoundPlayer.hpp"
 
+//#define DEBUG
+
 using namespace sf;
 
 class Client{
@@ -40,6 +42,7 @@ class Client{
     bool new_gameinfo;
     void apply_gameinfo(Gameinfo info);
     void recieve_loop();
+    void check_winner();
 
     //internal functions
     void check_movement();
@@ -86,7 +89,7 @@ void Client::set_texture(int id, int texture){
 
 void Client::pre_game(){
 
-    //defaults
+    //defaults (Can be easily accesed by CTRL-D on input)
     std::string ip = "127.0.0.1";
     int port = 35020;
 
@@ -102,14 +105,14 @@ void Client::pre_game(){
 
     Gameinitializer spawn = client.receive_spawn();
     std::cout << "My player id: " << spawn.client_id << std::endl;
-    std::cout << "Waiting for response with game metadata" << std::endl;
-    std::cout << "Got my spawn information" << std::endl;
+    //std::cout << "Waiting for response with game metadata" << std::endl;
+    //std::cout << "Got my spawn information" << std::endl;
     // print_metadata(spawn);
     // printf("\n");
     player_id = spawn.client_id;
 
 
-    std::cout << "Going into pre-game lobby to wait for the remaining players to join:" << std::endl;
+    //std::cout << "Going into pre-game lobby to wait for the remaining players to join:" << std::endl;
 
     //make all the players and give them random spawns for now
     //They will get updated locations later
@@ -236,6 +239,41 @@ void Client::check_bullet_fired(Vector2f mousePosWindow){
 
 }
 
+void Client::check_winner(){
+
+    int num_alive = (int)player.size();
+    for(size_t i=0; i<player.size(); i++){
+        if(!player[i].alive){
+            num_alive--;
+        }
+    }
+
+    if(num_alive < 2){ //game over
+        int winner;
+        for(size_t i=0; i<player.size(); i++){
+            if(player[i].alive){
+                winner = i;
+                break;
+            }
+        }
+        if(player_id == winner){
+            std::cout << "<---------- YOU WIN! ---------->" << std::endl;
+        }
+        else{
+            std::cout << "Player " << winner << " Won!" << std::endl
+                << "<---------- BETTER LUCK NEXT TIME! ---------->" << std::endl;
+        }
+
+        sleep(3);
+
+        exit(0);
+
+    }
+
+
+
+}
+
 void Client::game_loop(){
     //vectors for aiming
 
@@ -294,6 +332,7 @@ void Client::game_loop(){
             apply_gameinfo(latest_gameinfo);
         }
 
+
         window.clear();
         for (size_t i = 0; i < player.size(); i++){
              if(player[i].alive) window.draw(player[i].box);
@@ -301,6 +340,8 @@ void Client::game_loop(){
         for (size_t i = 0; i < bullets.size(); i++) window.draw(bullets[i].shape);
         for (size_t i = 0; i < walls.size(); i++) window.draw(walls[i].wall);
         window.display();
+
+        check_winner();
     }
 }
 
@@ -340,7 +381,9 @@ void Client::recieve_loop(){
         Gameinfo game = client.receive_gameinfo();
 
         //system("clear");
+#ifdef DEBUG
         print_gameinfo(game);
+#endif
 
         //I don't want to use a mutex so I'm doing this
         //The client will fetch it each frame if an update arrives
