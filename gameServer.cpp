@@ -76,6 +76,10 @@ int Server::update_player(Playerinfo info, int client){
 
     Bullet b;
 
+    if(!players[client].alive){
+        return 0;
+    }
+
     if(info.bullet_fired == 1){
 	    Vector2f PlayerCenter = Vector2f(players[client].box.getPosition().x, players[client].box.getPosition().y);
         b.shape.setPosition(PlayerCenter);
@@ -215,7 +219,7 @@ int Server::setup_game(int port, int player_count){
 
     //add players to game
 
-    for(int i=0; i<2; i++){
+    for(int i=0; i<3; i++){
         Player p;
         p.alive = true;
         p.lives = 2;
@@ -330,7 +334,7 @@ int Server::check_collisions(){
 
 int main(){
     Server server;
-    server.setup_game(35020, 2);
+    server.setup_game(35020, 3);
 
     server.main_loop();
 
