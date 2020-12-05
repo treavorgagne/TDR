@@ -56,13 +56,16 @@ Gameinfo Server::make_gameinfo(){
 
     //get bullet positions and velocities
     for(int i=0; i<(int)bullets.size(); i++){
+        printf("Adding a bullet to gameinfo\n");
         Bulletupdate b;
         b.type = 4;
         b.pos = bullets[i].shape.getPosition();
         b.direction = bullets[i].currVelocity;
+
+        info.bullets.push_back(b);
     }
 
-    //print_gameinfo(info);
+    print_gameinfo(info);
 
     return info;
 }

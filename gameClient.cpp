@@ -137,7 +137,7 @@ void Client::pre_game(){
 	player[player_id].username = name;
 
 	/* THIS CODE HERE IS FOR ONCE THE GAME START */
-	
+
 	printf("\n");
 	std::cout << "--GAME COUNTDOWN--" << std::endl;
 	std::cout << "--------5---------" << std::endl;
@@ -269,7 +269,7 @@ void Client::game_loop(){
   				break;
 			}
 		}
-		
+
 
 		if( player[player_id].alive ){
             check_movement();
@@ -286,7 +286,7 @@ void Client::game_loop(){
 				if (bullets[i].shape.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) {
 					bullets.erase(bullets.begin() + i);
 					//audio thud
-					
+
 				}
 			}
 

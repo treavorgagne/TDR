@@ -104,6 +104,7 @@ void print_gameinfo(Gameinfo info){
         printf("        Position: (%.2f, %.2f)\n", info.bullets[i].pos.x, info.bullets[i].pos.y);
         printf("        Direction: (%.2f, %.2f)\n", info.bullets[i].direction.x, info.bullets[i].direction.y);
     }
+    printf("Made it past bullets size of array was: %d\n", (int)info.bullets.size());
 }
 ///////////////////////////////PLAYERUPDATE & BULLETUPDATE
 ///////////////////////////////PLAYERUPDATE & BULLETUPDATE
