@@ -164,22 +164,24 @@ void Server::main_loop(){
     std::thread inputs(&Server::input_loop, this);
     //
     //
-    //int frame = 0;
+    int frame = 0;
 
     // update game
     while(1){
         //Collisions
         check_collisions();
 
-        /*//Send game updates
+        //Send game updates
         Gameinfo info = make_gameinfo();
 
         frame++;
-        if(frame % 10 == 0){
+        if(frame % 1 == 0){
             comm.broadcast_game_info(info);
         }
 
-        */
+        if(frame > 1000) frame=0;
+
+
 
         //render it
         window.clear();

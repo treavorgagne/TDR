@@ -9,6 +9,7 @@
 #include <vector>
 #include <cstdlib>
 #include <string>
+#include <thread>
 #include <unistd.h>
 
 using namespace sf;
@@ -31,6 +32,10 @@ class Client{
     //for networking
     Vector2f last_bullet_velocity;
 	bool bullet_fired;
+    Gameinfo latest_gameinfo;
+    bool new_gameinfo;
+    void apply_gameinfo(Gameinfo info);
+    void recieve_loop();
 
     //internal functions
     void check_movement();
@@ -44,7 +49,7 @@ class Client{
 };
 
 void Client::initialize(){
-
+    new_gameinfo = false;
     bullet_fired = false;
     last_bullet_velocity = Vector2f(0, 0);
 
@@ -238,6 +243,8 @@ void Client::game_loop(){
 	RenderWindow window(VideoMode(map.mapWidth, map.mapHeight),"TDR", (sf::Style::Titlebar | sf::Style::Close));
 	window.setFramerateLimit(60);
 
+    std::thread inputs(&Client::recieve_loop, this);
+
 	Cursor cursor;
 	if (cursor.loadFromSystem(Cursor::Cross)) window.setMouseCursor(cursor);
 
@@ -337,13 +344,11 @@ void Client::game_loop(){
             exit(1);
         }
 
-        /*
-        Gameinfo game = client.receive_gameinfo();
+        if(new_gameinfo){
+            new_gameinfo = false;
+            apply_gameinfo(latest_gameinfo);
+        }
 
-        printf("Recieved this game information\n");
-
-        print_gameinfo(game);
-        */
 		window.clear();
 		for (size_t i = 0; i < player.size(); i++){
 			 if(player[i].alive) window.draw(player[i].box);
@@ -352,6 +357,56 @@ void Client::game_loop(){
 		for (size_t i = 0; i < walls.size(); i++) window.draw(walls[i].wall);
 		window.display();
 	}
+}
+
+void Client::apply_gameinfo(Gameinfo info){
+
+
+    //create the bullets
+    std::vector<Bullet> newbulletvec;
+    for(size_t i=0; i<info.bullets.size(); i++){
+        Bullet b;
+        b.owner = player_id;
+        b.currVelocity = info.bullets[i].direction;
+        b.shape.setPosition(info.bullets[i].pos);
+
+        newbulletvec.push_back(b);
+    }
+
+    //Update the players
+
+    for(size_t i=0; i<info.players.size(); i++){
+        if((int)i != player_id){ //don't overwrite my own position with old info
+            player[i].box.setPosition(info.players[i].posinfo);
+        }
+            player[i].alive = info.players[i].alive;
+    }
+
+    //
+    // Assign the bullets
+    bullets = newbulletvec;
+
+}
+
+
+void Client::recieve_loop(){
+
+    while(1){
+        Gameinfo game = client.receive_gameinfo();
+
+        printf("Recieved this game information\n");
+
+        print_gameinfo(game);
+
+        //I don't want to use a mutex so I'm doing this
+        //The client will fetch it each fram an update arrives
+        latest_gameinfo = game;
+        new_gameinfo = true;
+
+
+    }
+
+
 }
 
 
