@@ -86,24 +86,16 @@ void Client::set_texture(int id, int texture){
 
 void Client::pre_game(){
 
-
-	std::string name;
-	//std::string ip;
-    //int port;
-
-	/*
+	std::string ip;
+    int port;
+	
 	std::cout << "Welcome to TDR" << std::endl;
-	std::cout << "Enter Username (no spaces) : ";
-	std::cin >> name;
     std::cout << "Enter IP Address: ";
     std::cin >> ip;
     std::cout << "Enter Port Number: ";
     std::cin >> port;
     std::cout << "Connecting to IP address: " << ip << " And Port Number: " << port << std::endl;
     client.connect(ip, port);
-    */
-    client.connect("127.0.0.1", 35020);
-
 
 	Gameinitializer spawn = client.receive_spawn();
 	std::cout << "My player id: " << spawn.client_id << std::endl;
@@ -132,9 +124,7 @@ void Client::pre_game(){
 
 	//code to set player info and position
 	player[player_id].player_id = spawn.client_id;
-	player[player_id].username = name;
 	player[player_id].box.setPosition(std::get<0>(spawn.spawn_location), std::get<1>(spawn.spawn_location));
-	player[player_id].username = name;
 
 	/* THIS CODE HERE IS FOR ONCE THE GAME START */
 
@@ -270,69 +260,12 @@ void Client::game_loop(){
 			}
 		}
 
-
 		if( player[player_id].alive ){
             check_movement();
             check_bullet_fired(Vector2f(Mouse::getPosition(window)));
 		}
 
-
-		// all this code will be removed once the client games is finished
-		for (size_t i = 0; i < bullets.size(); i++) {
-			bullets[i].shape.move(bullets[i].currVelocity);
-
-			// bullet wall collision
-			for (size_t j = 0; j < walls.size(); j++) {
-				if (bullets[i].shape.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) {
-					bullets.erase(bullets.begin() + i);
-					//audio thud
-
-				}
-			}
-
-			// bullet out of bounds
-			if (bullets[i].shape.getPosition().x < 0 || bullets[i].shape.getPosition().x > 600
-				|| bullets[i].shape.getPosition().y < 0 || bullets[i].shape.getPosition().y > 600)
-			{
-				bullets.erase(bullets.begin() + i);
-			}
-			else
-			{
-				// bullet player collision detector
-				for(size_t k = 0; k < player.size(); k++)
-				{
-					if( ( bullets[i].shape.getGlobalBounds().intersects(player[k].box.getGlobalBounds()) ) && ( bullets[i].owner != (int) k ))
-					{
-						player[bullets[i].owner].killCount++;
-						bullets.erase(bullets.begin() + i);
-						player[k].alive = false;
-						player[k].lives -= 1;
-					}
-
-				}
-			}
-		}
-
-		//will be removed once
-		for (size_t i = 0; i < player.size(); i++){
-
-			while(!player[i].alive && player[i].lives > 0){
-				// respawn;
-				bool spw = true;
-				Vector2f pos = Vector2f((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
-				player[i].box.setPosition(pos);
-
-				for (size_t j = 0; j < walls.size(); j++) {
-					if (player[i].box.getGlobalBounds().intersects(walls[j].wall.getGlobalBounds())) spw = false;
-				}
-				if (spw == true) {
-					player[i].alive = true;
-				}
-			 }
-		}
-
 		// update game
-        //
         Playerinfo info;
 
         if (bullet_fired){
