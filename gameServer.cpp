@@ -81,7 +81,7 @@ int Server::update_player(Playerinfo info, int client){
     }
 
     if(info.bullet_fired == 1){
-	    Vector2f PlayerCenter = Vector2f(players[client].box.getPosition().x, players[client].box.getPosition().y);
+        Vector2f PlayerCenter = Vector2f(players[client].box.getPosition().x, players[client].box.getPosition().y);
         b.shape.setPosition(PlayerCenter);
         b.currVelocity = info.bullet_direction;
         b.owner = client;
@@ -238,11 +238,11 @@ int Server::setup_game(int port, int player_count){
         std::cout << "Loading texture from file" << skin << std::endl;
         players[i].boxTexture.loadFromFile(skin);
         players[i].boxTexture.setSmooth(true);
-		players[i].box.setTexture(&players[i].boxTexture);
-		players[i].textureSize = players[i].boxTexture.getSize();
-		players[i].textureSize.x /= 4;
-		players[i].textureSize.y /= 4;
-		players[i].box.setTextureRect(IntRect(players[i].textureSize.x * 1, players[i].textureSize.y * 1,
+        players[i].box.setTexture(&players[i].boxTexture);
+        players[i].textureSize = players[i].boxTexture.getSize();
+        players[i].textureSize.x /= 4;
+        players[i].textureSize.y /= 4;
+        players[i].box.setTextureRect(IntRect(players[i].textureSize.x * 1, players[i].textureSize.y * 1,
                     players[i].textureSize.x, players[i].textureSize.y));
     }
     //set player spawns
