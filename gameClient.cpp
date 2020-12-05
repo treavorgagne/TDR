@@ -33,7 +33,6 @@ int main()
 	std::vector<Bullet> bullets;
 	ClientCommunicator client;
 	SoundPlayer playSound;
-	
 	std::string name;
 	std::string ip;
     int port;
@@ -218,7 +217,7 @@ int main()
 				bullets.push_back(Bullet(b));
 				firerate = eng.fireCap;
 				//audio pew pew
-				playSound.playWalk();
+				playSound.playShoot();
 						
 
 

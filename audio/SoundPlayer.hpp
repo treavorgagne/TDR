@@ -1,18 +1,21 @@
 #include <SFML/Audio.hpp>
 
-using namespace sf;
 
 class SoundPlayer {
 
-    private:
-        SoundBuffer ShootBuffer;
-        SoundBuffer WalkingBuffer;
 
-        Sound shootSound;
-        Sound walkSound;
-    
     public: 
         SoundPlayer();
-        void playWalk();
+        
         void playShoot();
+        void playWalk();
+
+    private:
+
+        sf::SoundBuffer shootBuffer;
+        sf::SoundBuffer walkBuffer;
+
+        sf::Sound shootSound;
+        sf::Sound walkSound; 
+         
 };
