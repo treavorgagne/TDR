@@ -86,9 +86,10 @@ void Client::set_texture(int id, int texture){
 
 void Client::pre_game(){
 
-    std::string ip;
-    int port;
-    
+    //defaults
+    std::string ip = "127.0.0.1";
+    int port = 35020;
+
     std::cout << "Welcome to TDR" << std::endl;
     std::cout << "Enter IP Address: ";
     std::cin >> ip;
@@ -96,6 +97,8 @@ void Client::pre_game(){
     std::cin >> port;
     std::cout << "Connecting to IP address: " << ip << " And Port Number: " << port << std::endl;
     client.connect(ip, port);
+
+    std::cout << "Waiting for all players to join..." << std::endl;
 
     Gameinitializer spawn = client.receive_spawn();
     std::cout << "My player id: " << spawn.client_id << std::endl;
@@ -105,11 +108,12 @@ void Client::pre_game(){
     // printf("\n");
     player_id = spawn.client_id;
 
+
     std::cout << "Going into pre-game lobby to wait for the remaining players to join:" << std::endl;
 
     //make all the players and give them random spawns for now
     //They will get updated locations later
-    while(player.size() < 3){
+    while((int)player.size() < spawn.num_players){
         p.box.setPosition((float) (rand() % (map.mapWidth-25)), (float) (rand() % (map.mapHeight-25)));
         player.push_back(Player(p));
     }
@@ -335,12 +339,11 @@ void Client::recieve_loop(){
     while(1){
         Gameinfo game = client.receive_gameinfo();
 
-        printf("Recieved this game information\n");
-
+        //system("clear");
         print_gameinfo(game);
 
         //I don't want to use a mutex so I'm doing this
-        //The client will fetch it each fram an update arrives
+        //The client will fetch it each frame if an update arrives
         latest_gameinfo = game;
         new_gameinfo = true;
 

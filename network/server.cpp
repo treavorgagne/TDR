@@ -53,7 +53,7 @@ int ServerCommunicator::wait_for_players(int playercount){
     return 0;
 }
 
-int ServerCommunicator::send_game_metadata(int client_id, float spawnx, float spawny){
+int ServerCommunicator::send_game_metadata(int client_id, float spawnx, float spawny, int num_players){
 
     Gameinitializer metadata;
 
@@ -63,6 +63,8 @@ int ServerCommunicator::send_game_metadata(int client_id, float spawnx, float sp
     metadata.spawn_location.second = spawny;
 
     sf::Packet packet;
+
+    metadata.num_players = num_players;
 
     packet << metadata;
 

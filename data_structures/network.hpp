@@ -43,6 +43,7 @@ struct Gameinitializer{
     int type; //type 3
     std::pair<float, float> spawn_location;
     int client_id;
+    int num_players;
 };
 
 int packet_type(sf::Packet packet);

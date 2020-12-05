@@ -104,7 +104,6 @@ void print_gameinfo(Gameinfo info){
         printf("        Position: (%.2f, %.2f)\n", info.bullets[i].pos.x, info.bullets[i].pos.y);
         printf("        Direction: (%.2f, %.2f)\n", info.bullets[i].direction.x, info.bullets[i].direction.y);
     }
-    printf("Made it past bullets size of array was: %d\n", (int)info.bullets.size());
 }
 ///////////////////////////////PLAYERUPDATE & BULLETUPDATE
 ///////////////////////////////PLAYERUPDATE & BULLETUPDATE
@@ -128,18 +127,20 @@ sf::Packet& operator >>(sf::Packet& packet, Bulletupdate& info){
 ///////////////////////////////SPAWNINFO
 ///////////////////////////////SPAWNINFO
 sf::Packet& operator >>(sf::Packet& packet, Gameinitializer& metadata){
-    return packet >> metadata.type >> metadata.client_id >> metadata.spawn_location;
+    return packet >> metadata.type >> metadata.client_id >> metadata.spawn_location >> metadata.num_players;
 };
 sf::Packet& operator <<(sf::Packet& packet, Gameinitializer& metadata){
-    return packet << 1 << metadata.client_id << metadata.spawn_location;
+    return packet << 1 << metadata.client_id << metadata.spawn_location << metadata.num_players;
 };
 
 void print_metadata(Gameinitializer metadata){
     printf("Client id: %d\n", metadata.client_id);
     printf("Spawn location (x,y): %.2f, %.2f\n", metadata.spawn_location.first, metadata.spawn_location.second);
+    printf("Total players: %d\n", metadata.num_players);
 }
 
 // returns the packet type so server/client know what to use to recieve it
+// Only used to verify client pakcets on server at the moment
 int packet_type(sf::Packet packet){
     Playerinfo info;
     packet >> info;

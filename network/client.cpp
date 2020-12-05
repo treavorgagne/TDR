@@ -59,6 +59,5 @@ Gameinitializer ClientCommunicator::receive_spawn(){
     }
 
     packet >> info;
-
     return info;
 }

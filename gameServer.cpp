@@ -12,6 +12,8 @@
 #include <string>
 #include <unistd.h>
 
+//#define DEBUG
+
 using namespace sf;
 class Server{
     GameMap map;
@@ -56,7 +58,6 @@ Gameinfo Server::make_gameinfo(){
 
     //get bullet positions and velocities
     for(int i=0; i<(int)bullets.size(); i++){
-        printf("Adding a bullet to gameinfo\n");
         Bulletupdate b;
         b.type = 4;
         b.pos = bullets[i].shape.getPosition();
@@ -65,7 +66,9 @@ Gameinfo Server::make_gameinfo(){
         info.bullets.push_back(b);
     }
 
+#ifdef DEBUG
     print_gameinfo(info);
+#endif
 
     return info;
 }
@@ -171,7 +174,6 @@ void Server::main_loop(){
     std::thread inputs(&Server::input_loop, this);
     //
     //
-    int frame = 0;
 
     // update game
     while(1){
@@ -181,12 +183,8 @@ void Server::main_loop(){
         //Send game updates
         Gameinfo info = make_gameinfo();
 
-        frame++;
-        if(frame % 1 == 0){
-            comm.broadcast_game_info(info);
-        }
+        comm.broadcast_game_info(info);
 
-        if(frame > 1000) frame=0;
 
 
 
@@ -215,14 +213,18 @@ int Server::setup_game(int port, int player_count){
 
     //wait for players to connect;
     comm.start(port);
+
+    std::cout << "Waiting for players to connect" << std::endl;
+
     comm.wait_for_players(player_count);
+
 
     //add players to game
 
-    for(int i=0; i<3; i++){
+    for(int i=0; i<player_count; i++){
         Player p;
         p.alive = true;
-        p.lives = 2;
+        p.lives = 1;
         p.player_id = i;
         p.username = i;
         players.push_back(p);
@@ -235,7 +237,7 @@ int Server::setup_game(int port, int player_count){
         std::string end = ".png";
         skin.append(num);
         skin.append(end);
-        std::cout << "Loading texture from file" << skin << std::endl;
+        //std::cout << "Loading texture from file" << skin << std::endl;
         players[i].boxTexture.loadFromFile(skin);
         players[i].boxTexture.setSmooth(true);
         players[i].box.setTexture(&players[i].boxTexture);
@@ -266,7 +268,7 @@ int Server::set_spawns(){
 
         players[player_id].box.setPosition(pos.x, pos.y);
 
-        comm.send_game_metadata(player_id, pos.x, pos.y);
+        comm.send_game_metadata(player_id, pos.x, pos.y, (int)players.size());
 
     }
 
@@ -316,7 +318,7 @@ int Server::check_collisions(){
             for(size_t k = 0; k < players.size(); k++){
                 if( (bullets[i].shape.getGlobalBounds().intersects(players[k].box.getGlobalBounds()) )
                         && ( bullets[i].owner != (int) k )){
-                        //bullets can't hit the person who fired them?
+                        //bullets can't hit the person who fired them.
                         players[bullets[i].owner].killCount++;
                         bullets.erase(bullets.begin() + i);
                         players[k].alive = false;
@@ -334,7 +336,20 @@ int Server::check_collisions(){
 
 int main(){
     Server server;
-    server.setup_game(35020, 3);
+
+    int player_count = 0;
+
+    std::cout << "Enter number of players: ";
+    std::cin >> player_count;
+
+    if(player_count < 2){
+        std::cout << "Cannot start game with less than 2 players" << std::endl;
+        exit(1);
+    }
+
+    //Prevented from changing the port at runtime for simplicity
+    //Could easily be modifed to allow this in future
+    server.setup_game(35020, player_count);
 
     server.main_loop();
 

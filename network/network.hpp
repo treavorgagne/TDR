@@ -42,6 +42,6 @@ class ServerCommunicator {
         int wait_for_players(int playercount);
         int accept_inputs();
         int broadcast_game_info(Gameinfo info);
-        int send_game_metadata(int clientid, float spawnx, float spawny);
+        int send_game_metadata(int clientid, float spawnx, float spawny, int num_players);
 
 };
