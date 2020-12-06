@@ -244,7 +244,7 @@ int Server::setup_game(int port, int player_count){
         players[i].textureSize = players[i].boxTexture.getSize();
         players[i].textureSize.x /= 4;
         players[i].textureSize.y /= 4;
-        players[i].box.setTextureRect(IntRect(players[i].textureSize.x * 1, players[i].textureSize.y * 1,
+        players[i].box.setTextureRect(IntRect(players[i].textureSize.x * 0, players[i].textureSize.y * 0,
                     players[i].textureSize.x, players[i].textureSize.y));
     }
     //set player spawns
