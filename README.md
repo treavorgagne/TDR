@@ -1,3 +1,12 @@
+Group Project: 
+I had (Treavor Gagne) a big hand in programming the game mechanics and designing the
+overall system architecture. Created map, players, hit detection, spawning, shooting,
+movements, and debugging various portions of the game. Used C++ to write modular code
+of classes to make the game extensible for further content in the future.
+
+
+Description:
+
 TDR will be a 2 dimensional top down point of view battle royale shooter.  TDRwill 
 be a no time limit game with 2 to 150 player lobbies with the winner beingthe last 
 player standing. All players will have the same weapon with infiniteammo, fire rate 
